@@ -21,14 +21,14 @@ public class RenderCraftingCore extends TileEntitySpecialRenderer<TileCraftingCo
 	public void render(TileCraftingCore tile, double x, double y, double z, float partialTick, int destroyStage, float alpha) {
 		IBlockState state = tile.getWorld().getBlockState(tile.getPos());
 
-		if (state == null || state.getBlock() != ModBlocks.blockCraftingCore)
+		if (state.getBlock() != ModBlocks.blockCraftingCore)
 			return;
 
 		ItemStack stack = tile.getInventory().getStackInSlot(0);
 		if (!stack.isEmpty()) {
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x + 0.5D, y + 1.4D, z + 0.5D);
-			float scale = (float) (stack.getItem() instanceof ItemBlock ? 0.85F : 0.65F);
+			float scale = stack.getItem() instanceof ItemBlock ? 0.85F : 0.65F;
 			GlStateManager.scale(scale, scale, scale);
 			double tick = Minecraft.getSystemTime() / 800.0D;
 			GlStateManager.translate(0.0D, Math.sin(tick % (2 * Math.PI)) * 0.065D, 0.0D);

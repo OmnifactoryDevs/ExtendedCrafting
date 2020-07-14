@@ -25,7 +25,7 @@ public class RenderCompressor extends TileEntitySpecialRenderer<TileCompressor> 
 		
 		IBlockState state = tile.getWorld().getBlockState(tile.getPos());
 
-		if (state == null || state.getBlock() != ModBlocks.blockCompressor || !tile.getWorld().isAirBlock(tile.getPos().up()))
+		if (state.getBlock() != ModBlocks.blockCompressor || !tile.getWorld().isAirBlock(tile.getPos().up()))
 			return;
 
 		CompressorRecipe recipe = tile.getRecipe();
@@ -33,7 +33,7 @@ public class RenderCompressor extends TileEntitySpecialRenderer<TileCompressor> 
 			ItemStack stack = recipe.getOutput();
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x + 0.5D, y + 1.4D, z + 0.5D);
-			float scale = (float) (stack.getItem() instanceof ItemBlock ? 0.8F : 0.6F);
+			float scale = stack.getItem() instanceof ItemBlock ? 0.8F : 0.6F;
 			GlStateManager.scale(scale, scale, scale);
 			double tick = Minecraft.getSystemTime() / 800.0D;
 			GlStateManager.translate(0.0D, Math.sin(tick % (2 * Math.PI)) * 0.065D, 0.0D);

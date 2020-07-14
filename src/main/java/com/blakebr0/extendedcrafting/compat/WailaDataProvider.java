@@ -68,7 +68,7 @@ public class WailaDataProvider implements IWailaDataProvider {
 			}
 			
 			CombinationRecipe recipe = core.getRecipe();
-			ItemStack output = recipe.getOutput();
+			ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
 			tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
 		}
 		
@@ -106,7 +106,7 @@ public class WailaDataProvider implements IWailaDataProvider {
 			}
 			
 			CompressorRecipe recipe = compressor.getRecipe();
-			ItemStack output = recipe.getOutput();
+			ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
 			tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
 		}
 		

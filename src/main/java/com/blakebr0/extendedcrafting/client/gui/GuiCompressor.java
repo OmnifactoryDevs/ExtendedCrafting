@@ -1,10 +1,5 @@
 package com.blakebr0.extendedcrafting.client.gui;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
@@ -13,7 +8,6 @@ import com.blakebr0.extendedcrafting.network.EjectModeSwitchPacket;
 import com.blakebr0.extendedcrafting.network.InputLimitSwitchPacket;
 import com.blakebr0.extendedcrafting.network.NetworkThingy;
 import com.blakebr0.extendedcrafting.tile.TileCompressor;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -23,6 +17,12 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class GuiCompressor extends GuiContainer {
 
@@ -73,7 +73,7 @@ public class GuiCompressor extends GuiContainer {
 	private void drawFakeItemStack(ItemStack stack, int xOffset, int yOffset, int mouseX, int mouseY) {
 		GlStateManager.pushMatrix();
 		RenderHelper.enableGUIStandardItemLighting();
-		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset, (String) null);
+		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset, null);
 		GlStateManager.popMatrix();
 	}
 
@@ -113,15 +113,15 @@ public class GuiCompressor extends GuiContainer {
 	@Override
 	public void initGui() {
 		super.initGui();
-		this.buttonList.add(new GuiButton(1, this.guiLeft + 69, this.guiTop + 29, 11, 9, (String) null) {
+		this.buttonList.add(new GuiButton(1, this.guiLeft + 69, this.guiTop + 29, 11, 9, "") {
 			@Override
-			public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+			public void drawButton(@Nullable Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 
 			}
 		});
-		this.buttonList.add(new GuiButton(2, this.guiLeft + 91, this.guiTop + 74, 7, 10, (String) null) {
+		this.buttonList.add(new GuiButton(2, this.guiLeft + 91, this.guiTop + 74, 7, 10, "") {
 			@Override
-			public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+			public void drawButton(@Nullable Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 
 			}
 		});

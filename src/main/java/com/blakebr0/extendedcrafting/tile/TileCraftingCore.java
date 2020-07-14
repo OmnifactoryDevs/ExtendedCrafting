@@ -11,6 +11,7 @@ import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -25,13 +26,10 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -46,16 +44,15 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 
 	private static List<CombinationRecipe> getValidRecipes(ItemStack stack) {
 		List<CombinationRecipe> valid = new ArrayList<>();
-		
+
 		if (!stack.isEmpty()) {
 			for (CombinationRecipe recipe : CombinationRecipeManager.getInstance().getRecipes()) {
-				ItemStack input = recipe.getInput();
-				if (!input.isEmpty() && input.isItemEqual(stack) && StackHelper.compareTags(input, stack)) {
+				if (recipe.getInput().apply(stack)) {
 					valid.add(recipe);
 				}
 			}
 		}
-		
+
 		return valid;
 	}
 
@@ -67,7 +64,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 
 		if (!this.getWorld().isRemote) {
 			CombinationRecipe recipe = this.getRecipe();
-			if (this.getEnergy().getEnergyStored() > 0) {
+			if (recipe != null && this.getEnergy().getEnergyStored() > 0) {
 				List<TilePedestal> pedestals = this.getPedestalsWithStuff(recipe, pedestalLocations);
 				boolean done = this.process(recipe);
 				if (done) {
@@ -102,22 +99,22 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 	private List<BlockPos> locatePedestals() {
 		ArrayList<BlockPos> pedestals = new ArrayList<>();
 		Iterable<BlockPos> blocks = BlockPos.getAllInBox(this.getPos().add(-3, 0, -3), this.getPos().add(3, 0, 3));
-		
+
 		for (BlockPos aoePos : blocks) {
 			Block block = this.getWorld().getBlockState(aoePos).getBlock();
 			if (block instanceof BlockPedestal) {
 				pedestals.add(aoePos);
 			}
 		}
-		
+
 		this.pedestalCount = pedestals.size();
-		
+
 		return pedestals;
 	}
 
 	private List<TilePedestal> getPedestalsWithStuff(CombinationRecipe recipe, List<BlockPos> locations) {
-		ArrayList<Object> remaining = new ArrayList<>(recipe.getPedestalItems());
-		ArrayList<TilePedestal> pedestals = new ArrayList<>();
+		List<Ingredient> remaining = new LinkedList<>(recipe.getPedestalIngredients());
+		List<TilePedestal> pedestals = new ArrayList<>();
 
 		if (locations.isEmpty()) return Collections.emptyList();
 
@@ -125,35 +122,24 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 			TileEntity tile = this.getWorld().getTileEntity(pos);
 			if (tile instanceof TilePedestal) {
 				TilePedestal pedestal = (TilePedestal) tile;
-				for (Object o : remaining) {
-					boolean match = false;
-					Object next = o;
+				for (Iterator<Ingredient> it = remaining.iterator(); it.hasNext(); ) {
+					Ingredient i = it.next();
 					ItemStack stack = pedestal.getInventory().getStackInSlot(0);
-					if (next instanceof ItemStack) {
-						ItemStack nextStack = (ItemStack) next;
-						match = OreDictionary.itemMatches(nextStack, stack, false) && (!nextStack.hasTagCompound() || StackHelper.compareTags(nextStack, stack));
-					} else if (next instanceof List) {
-						Iterator<ItemStack> itr = ((List<ItemStack>) next).iterator();
-						while (itr.hasNext()) {
-							match = OreDictionary.itemMatches(itr.next(), stack, false);
-							if (match) break;
-						}
-					}
 
-					if (match) {
+					if (i.apply(stack)) {
 						pedestals.add(pedestal);
-						remaining.remove(next);
+						it.remove();
 						break;
 					}
 				}
 			}
 		}
-		
-		if (pedestals.size() != recipe.getPedestalItems().size()) 
-			return null;
-		
-		if (!remaining.isEmpty()) return null;
-		
+
+		if (pedestals.size() != recipe.getPedestalIngredients().size())
+			return Collections.emptyList();
+
+		if (!remaining.isEmpty()) return Collections.emptyList();
+
 		return pedestals;
 	}
 
@@ -163,34 +149,37 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 		if (difference < recipe.getPerTick()) {
 			extract = (int) difference;
 		}
-		
+
 		int extracted = this.getEnergy().extractEnergy(extract, false);
 		this.progress += extracted;
 
 		return this.progress >= recipe.getCost();
 	}
-	
+
+	@Nullable
 	public CombinationRecipe getRecipe() {
 		return getRecipe(locatePedestals());
 	}
 
+	@Nullable
 	public CombinationRecipe getRecipe(List<BlockPos> locations) {
 		List<CombinationRecipe> recipes = getValidRecipes(this.getInventory().getStackInSlot(0));
-		
+
 		if (!recipes.isEmpty()) {
 			for (CombinationRecipe recipe : recipes) {
 				List<TilePedestal> pedestals = this.getPedestalsWithStuff(recipe, locations);
-				return recipe;
+				if (!pedestals.isEmpty())
+					return recipe;
 			}
 		}
-		
+
 		return null;
 	}
 
 	public int getProgress() {
 		return this.progress;
 	}
-	
+
 	public IItemHandlerModifiable getInventory() {
 		return this.inventory;
 	}
@@ -217,7 +206,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 		tag.merge(this.inventory.serializeNBT());
 		tag.setInteger("Progress", this.progress);
 		tag.setInteger("Energy", this.energy.getEnergyStored());
-		
+
 		return tag;
 	}
 
@@ -243,21 +232,21 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 	}
 
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing side) {
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing side) {
 		return this.getCapability(capability, side) != null;
 	}
 
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing side) {
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing side) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.inventory);
 		} else if (capability == CapabilityEnergy.ENERGY) {
 			return CapabilityEnergy.ENERGY.cast(this.energy);
 		}
-		
+
 		return super.getCapability(capability, side);
 	}
-	
+
 	public boolean isUseableByPlayer(EntityPlayer player) {
 		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
 	}

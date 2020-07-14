@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -18,14 +19,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
@@ -40,35 +44,17 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 	private boolean ejecting = false;
 	private int oldEnergy;
 	private boolean inputLimit = true;
-	
+
 	private List<CompressorRecipe> getValidRecipes(ItemStack stack) {
 		List<CompressorRecipe> valid = new ArrayList<>();
 		if (!stack.isEmpty()) {
 			for (CompressorRecipe recipe : CompressorRecipeManager.getInstance().getRecipes()) {
-				Object input = recipe.getInput();
-				if (input instanceof ItemStack) {
-					ItemStack inputStack = (ItemStack) input;
-					if (inputStack.getItemDamage() == 32767) {
-						if (inputStack.getItem() == stack.getItem()) {
-							valid.add(recipe);
-						}
-					}
-					
-					if (inputStack.isItemEqual(stack) && StackHelper.compareTags(inputStack, stack)) {
-						valid.add(recipe);
-					}
-				} else if (input instanceof List) {
-					for (ItemStack next : (List<ItemStack>) input) {
-						if (next.getMetadata() == 32767 || next.getMetadata() == stack.getMetadata()) {
-							if (next.getItem() == stack.getItem()) {
-								valid.add(recipe);
-							}
-						}
-					}
+				if (recipe.getInput().apply(stack)) {
+					valid.add(recipe);
 				}
 			}
 		}
-		
+
 		return valid;
 	}
 
@@ -84,24 +70,20 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 			if (!input.isEmpty()) {
 				if (this.materialStack.isEmpty()) {
 					this.materialStack = input.copy();
-					if (!mark) {
-						mark = true;
-					}
+					mark = true;
 				}
-				
+
 				if (!this.inputLimit || (recipe != null && this.materialCount < recipe.getInputCount())) {
 					if (StackHelper.areStacksEqual(input, this.materialStack)) {
 						int consumeAmount = input.getCount();
-						if (this.inputLimit) {
+						if (this.inputLimit && recipe != null) {
 							consumeAmount = Math.min(consumeAmount, recipe.getInputCount() - this.materialCount);
 						}
-						
+
 						StackHelper.decrease(input, consumeAmount, false);
 						this.materialCount += consumeAmount;
-						if (!mark) {
-							mark = true;
-						}
-					}					
+						mark = true;
+					}
 				}
 			}
 
@@ -115,10 +97,10 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 							if (recipe.consumeCatalyst()) {
 								StackHelper.decrease(this.getStackInSlot(2), 1, false);
 							}
-							
+
 							this.progress = 0;
 							this.materialCount -= recipe.getInputCount();
-							
+
 							if (this.materialCount <= 0) {
 								this.materialStack = ItemStack.EMPTY;
 							}
@@ -132,7 +114,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 					ItemStack toAdd = this.materialStack.copy();
 					int addCount = Math.min(this.materialCount, toAdd.getMaxStackSize());
 					toAdd.setCount(addCount);
-					
+
 					int added = this.addStackToSlot(0, toAdd);
 					if (added > 0) {
 						this.materialCount -= added;
@@ -163,45 +145,34 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 		}
 	}
 
+	@Nullable
 	public CompressorRecipe getRecipe() {
 		List<CompressorRecipe> recipes = this.getValidRecipes(this.materialStack);
 		if (!recipes.isEmpty()) {
 			for (CompressorRecipe recipe : recipes) {
 				ItemStack mat = this.materialStack;
-				Object input = recipe.getInput();
+				Ingredient input = recipe.getInput();
 
-				if (input instanceof ItemStack) {
-					if ((StackHelper.areItemsEqual((ItemStack) input, mat, true)) && this.getStackInSlot(2).isItemEqual(recipe.getCatalyst())) {
-						return recipe;
-					}
-				} else if (input instanceof List) {
-					Iterator<ItemStack> itr = ((List<ItemStack>) input).iterator();
-					while (itr.hasNext()) {
-						ItemStack next = itr.next();
-						if ((StackHelper.areItemsEqual(next, mat, true)) && this.getStackInSlot(2).isItemEqual(recipe.getCatalyst())) {
-							return recipe;
-						}
-					}
+				if (input.apply(mat)) {
+					return recipe;
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
-	private boolean process(CompressorRecipe recipe) {
+
+	private void process(CompressorRecipe recipe) {
 		int extract = recipe.getPowerRate();
 		int difference = recipe.getPowerCost() - this.progress;
 		if (difference < extract) {
 			extract = difference;
 		}
-		
+
 		int extracted = this.getEnergy().extractEnergy(extract, false);
 		this.progress += extracted;
-
-		return this.progress >= recipe.getPowerCost();
 	}
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		compound = super.writeToNBT(compound);
@@ -235,7 +206,8 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 
 	/**
 	 * Tries to add a stack to the specified slot, returns the amount added
-	 * @param slot the slot to insert to
+	 *
+	 * @param slot  the slot to insert to
 	 * @param stack the stack to insert
 	 * @return the amount added
 	 */
@@ -253,7 +225,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 				return newSize - slotStack.getCount();
 			}
 		}
-		
+
 		return 0;
 	}
 
@@ -300,11 +272,11 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 			this.markDirty();
 		}
 	}
-	
+
 	public boolean isLimitingInput() {
 		return this.inputLimit;
 	}
-	
+
 	public void toggleInputLimit() {
 		this.inputLimit = !this.inputLimit;
 		this.markDirty();
@@ -326,7 +298,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 
 	@Override
 	public ItemStack getStackInSlot(int index) {
-		return (ItemStack) this.inventoryStacks.get(index);
+		return this.inventoryStacks.get(index);
 	}
 
 	@Override
@@ -341,7 +313,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 
 	@Override
 	public void setInventorySlotContents(int index, ItemStack stack) {
-		ItemStack itemstack = (ItemStack) this.inventoryStacks.get(index);
+		ItemStack itemstack = this.inventoryStacks.get(index);
 		boolean flag = !stack.isEmpty() && StackHelper.areStacksEqual(stack, itemstack);
 		this.inventoryStacks.set(index, stack);
 
@@ -405,7 +377,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 
 	@Override
 	public String getName() {
-		return null;
+		return getDisplayName().getFormattedText();
 	}
 
 	@Override
@@ -415,7 +387,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 
 	@Override
 	public int[] getSlotsForFace(EnumFacing side) {
-		return side == EnumFacing.DOWN ? new int[] { 0 } : side == EnumFacing.UP ? new int[] { 1 } : new int[] { 0, 1 };
+		return side == EnumFacing.DOWN ? new int[]{0} : side == EnumFacing.UP ? new int[]{1} : new int[]{0, 1};
 	}
 
 	@Override
@@ -429,18 +401,25 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 	}
 
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing side) {
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing side) {
 		return this.getCapability(capability, side) != null;
 	}
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing facing) {
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return (T) new SidedInvWrapper(this, facing);
 		} else if (capability == CapabilityEnergy.ENERGY) {
 			return CapabilityEnergy.ENERGY.cast(this.energy);
 		}
-		
+
 		return super.getCapability(capability, facing);
+	}
+
+	@Nonnull
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TextComponentTranslation("tile.ec.compressor.name");
 	}
 }

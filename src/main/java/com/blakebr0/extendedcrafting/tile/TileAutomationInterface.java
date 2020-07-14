@@ -15,7 +15,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -433,7 +432,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	
 	public IExtendedTable getTable() {
 		TileEntity tile = this.getWorld().getTileEntity(this.getPos().down());
-		return tile != null && tile instanceof IExtendedTable ? (IExtendedTable) tile : null;
+		return tile instanceof IExtendedTable ? (IExtendedTable) tile : null;
 	}
 	
 	public boolean hasTable() {
@@ -472,7 +471,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		
 		if (this.isEnderCrafter()) {
 			TableCrafting crafting = new TableCrafting(new EmptyContainer(), table);
-			this.result = ((IRecipe) EnderCrafterRecipeManager.getInstance().findMatchingRecipe(crafting, this.getWorld())).getCraftingResult(crafting);
+			this.result = EnderCrafterRecipeManager.getInstance().findMatchingRecipe(crafting, this.getWorld()).getCraftingResult(crafting);
 		} else {
 			ItemStack result = table.getResult();
 			if (result != null) {

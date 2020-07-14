@@ -1,7 +1,5 @@
 package com.blakebr0.extendedcrafting.client.gui.automationinterface;
 
-import java.io.IOException;
-
 import com.blakebr0.cucumber.gui.GuiIcons;
 import com.blakebr0.cucumber.gui.button.IconButton;
 import com.blakebr0.cucumber.helper.ResourceHelper;
@@ -12,7 +10,6 @@ import com.blakebr0.extendedcrafting.lib.ViewRecipeInfo;
 import com.blakebr0.extendedcrafting.network.InterfaceRecipeChangePacket;
 import com.blakebr0.extendedcrafting.network.NetworkThingy;
 import com.blakebr0.extendedcrafting.tile.TileAutomationInterface;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -20,6 +17,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+
+import java.io.IOException;
 
 public class GuiAutomationInterface extends GuiContainer {
 
@@ -130,7 +129,7 @@ public class GuiAutomationInterface extends GuiContainer {
         FontRenderer font = stack.getItem().getFontRenderer(stack);
         if (font == null) font = this.fontRenderer;
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, (String) null);
+        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, null);
         this.zLevel = 0.0F;
         this.itemRender.zLevel = 0.0F;
         GlStateManager.popMatrix();
@@ -145,8 +144,6 @@ public class GuiAutomationInterface extends GuiContainer {
     private ViewRecipeInfo getViewRecipeInfo() {
     	int size = (int) Math.sqrt(this.tile.getRecipe().getSlots());
     	switch (size) {
-    	case 3:
-    		return ViewRecipeInfo.BASIC;
     	case 5:
     		return ViewRecipeInfo.ADVANCED;
     	case 7:

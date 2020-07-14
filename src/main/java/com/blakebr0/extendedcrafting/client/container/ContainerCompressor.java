@@ -49,7 +49,7 @@ public class ContainerCompressor extends Container {
 				}
 				
 				slot.onSlotChange(itemstack1, itemstack);
-			} else if (slotNumber >= 3) {
+			} else {
 				ItemStack inputStack = this.inventorySlots.get(1).getStack();
                 if (inputStack.isEmpty() || (inputStack.isItemEqual(itemstack1) && inputStack.getCount() < inputStack.getMaxStackSize())) {
 					if (!this.mergeItemStack(itemstack1, 1, 2, false)) {
@@ -59,13 +59,11 @@ public class ContainerCompressor extends Container {
 					if (!this.mergeItemStack(itemstack1, 30, 39, false)) {
 						return ItemStack.EMPTY;
 					}
-				} else if (slotNumber >= 30 && slotNumber < 39) {
+				} else if (slotNumber < 39) {
 					if (!this.mergeItemStack(itemstack1, 3, 30, false)) {
 						return ItemStack.EMPTY;
 					}
 				}
-			} else if (!this.mergeItemStack(itemstack1, 3, 39, false)) {
-				return ItemStack.EMPTY;
 			}
 
 			if (itemstack1.getCount() == 0) {

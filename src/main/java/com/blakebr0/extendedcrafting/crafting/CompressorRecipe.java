@@ -1,44 +1,26 @@
 package com.blakebr0.extendedcrafting.crafting;
 
 import com.blakebr0.extendedcrafting.config.ModConfig;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.oredict.OreDictionary;
-
-import java.util.List;
+import net.minecraft.item.crafting.Ingredient;
 
 public class CompressorRecipe {
 
 	protected ItemStack output;
-	protected Object input;
+	protected Ingredient input;
 	protected int inputCount;
-	protected ItemStack catalyst;
+	protected Ingredient catalyst;
 	protected boolean consumeCatalyst;
 	protected int powerCost;
 	protected int powerRate;
 	
-	public CompressorRecipe(ItemStack output, Object input, int inputCount, ItemStack catalyst, boolean consumeCatalyst, int powerCost) {
+	public CompressorRecipe(ItemStack output, Ingredient input, int inputCount, Ingredient catalyst, boolean consumeCatalyst, int powerCost) {
 		this(output, input, inputCount, catalyst, consumeCatalyst, powerCost, ModConfig.confCompressorRFRate);
 	}
 
-	public CompressorRecipe(ItemStack output, Object input, int inputCount, ItemStack catalyst, boolean consumeCatalyst, int powerCost, int powerRate) {
+	public CompressorRecipe(ItemStack output, Ingredient input, int inputCount, Ingredient catalyst, boolean consumeCatalyst, int powerCost, int powerRate) {
 		this.output = output;
-		
-		if (input instanceof ItemStack) {
-			this.input = ((ItemStack) input).copy();
-		} else if (input instanceof Item) {
-			this.input = new ItemStack((Item) input);
-		} else if (input instanceof Block) {
-			this.input = new ItemStack((Block) input);
-		} else if (input instanceof String) {
-			this.input = OreDictionary.getOres((String) input);
-		} else if (input instanceof List) {
-			this.input = input;
-		} else {
-			throw new RuntimeException("Invalid compressor recipe input: " + input.toString());
-		}
-		
+		this.input = input;
 		this.inputCount = inputCount;
 		this.catalyst = catalyst;
 		this.consumeCatalyst = consumeCatalyst;
@@ -50,7 +32,7 @@ public class CompressorRecipe {
 		return this.output.copy();
 	}
 
-	public Object getInput() { // FIXME use Ingredients
+	public Ingredient getInput() {
 		return this.input;
 	}
 
@@ -58,8 +40,8 @@ public class CompressorRecipe {
 		return this.inputCount;
 	}
 
-	public ItemStack getCatalyst() {
-		return this.catalyst.copy();
+	public Ingredient getCatalyst() {
+		return this.catalyst;
 	}
 
 	public boolean consumeCatalyst() {

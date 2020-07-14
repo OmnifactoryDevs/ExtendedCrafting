@@ -58,20 +58,20 @@ public class TableRecipeShapeless extends TableRecipeBase {
 		for (int x = 0; x < inv.getSizeInventory(); x++) {
 			ItemStack slot = inv.getStackInSlot(x);
 
-			if (!slot.isEmpty()) {
-				boolean inRecipe = false;
-				Iterator<Ingredient> req = required.iterator();
+			mark:
+			{
+				if (!slot.isEmpty()) {
+					Iterator<Ingredient> req = required.iterator();
 
-				while (req.hasNext()) {
-					Ingredient target = req.next();
-					if (target.apply(slot)) {
-						inRecipe = true;
-						req.remove();
-						break;
+					while (req.hasNext()) {
+						Ingredient target = req.next();
+						if (target.apply(slot)) {
+							req.remove();
+							break mark;
+						}
 					}
+					return false;
 				}
-
-				if (!inRecipe) return false;
 			}
 		}
 

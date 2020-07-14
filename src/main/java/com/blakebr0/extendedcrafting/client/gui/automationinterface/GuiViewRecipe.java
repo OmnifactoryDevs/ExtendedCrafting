@@ -36,9 +36,7 @@ public class GuiViewRecipe extends GuiContainer {
 		this.ySize = info.height;
 		
 		switch (width) {
-		case 3:
-			this.grid = GuiBasicTable.GUI; break;
-		case 5:
+			case 5:
 			this.grid = GuiAdvancedTable.GUI; break;
 		case 7:
 			this.grid = GuiEliteTable.GUI; break;

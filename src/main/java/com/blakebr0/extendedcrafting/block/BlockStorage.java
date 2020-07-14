@@ -1,16 +1,12 @@
 package com.blakebr0.extendedcrafting.block;
 
-import java.util.List;
-
 import com.blakebr0.cucumber.block.BlockBase;
 import com.blakebr0.cucumber.iface.IModelHelper;
 import com.blakebr0.cucumber.lib.Colors;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
-
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -26,9 +22,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.ModelLoader;
 
+import java.util.List;
+import java.util.Objects;
+
 public class BlockStorage extends BlockBase implements IModelHelper {
 
-	public static final PropertyEnum<Type> VARIANT = PropertyEnum.<Type> create("variant", Type.class);
+	public static final PropertyEnum<Type> VARIANT = PropertyEnum.create("variant", Type.class);
 
 	public BlockStorage() {
 		super("ec.storage", Material.IRON, SoundType.METAL, 5.0F, 10.0F);
@@ -53,7 +52,7 @@ public class BlockStorage extends BlockBase implements IModelHelper {
 	
 	@Override
 	public int damageDropped(IBlockState state) {
-		return ((Type) state.getValue(VARIANT)).getMetadata();
+		return state.getValue(VARIANT).getMetadata();
 	}
 
 	@Override
@@ -66,7 +65,7 @@ public class BlockStorage extends BlockBase implements IModelHelper {
 	@Override
 	public void initModels() {
 		for (Type type : Type.values()) {
-			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), type.getMetadata(), new ModelResourceLocation(getRegistryName().toString() + "_" + type.byMetadata(type.getMetadata()).getName()));
+			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), type.getMetadata(), new ModelResourceLocation(Objects.requireNonNull(getRegistryName()).toString() + "_" + type.byMetadata(type.getMetadata()).getName()));
 		}
 	}
 
@@ -77,12 +76,12 @@ public class BlockStorage extends BlockBase implements IModelHelper {
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return ((Type) state.getValue(VARIANT)).getMetadata();
+		return state.getValue(VARIANT).getMetadata();
 	}
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { VARIANT });
+		return new BlockStateContainer(this, VARIANT);
 	}
 	
 	@Override

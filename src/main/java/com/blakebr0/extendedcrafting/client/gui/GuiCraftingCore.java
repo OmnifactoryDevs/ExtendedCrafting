@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+@SuppressWarnings("SameParameterValue")
 public class GuiCraftingCore extends GuiContainer {
 
 	private static final ResourceLocation GUI = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/gui/crafting_core.png");
@@ -34,7 +35,8 @@ public class GuiCraftingCore extends GuiContainer {
 
 	private int getProgressBarScaled(int pixels) {
 		int i = this.tile.getProgress();
-		long j = this.tile.getRecipe().getCost();
+		CombinationRecipe recipe = this.tile.getRecipe();
+		long j = recipe == null ? 0 : recipe.getCost();
 		return (int) (j != 0 && i != 0 ? (long) i * pixels / j : 0);
 	}
 
@@ -64,7 +66,6 @@ public class GuiCraftingCore extends GuiContainer {
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		int left = this.guiLeft;
-		int top = this.guiTop;
 
 		this.drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -72,7 +73,7 @@ public class GuiCraftingCore extends GuiContainer {
 		
 		if (this.tile.getRecipe() != null) {
 			ItemStack output = this.tile.getRecipe().getOutput();
-			this.drawFakeItemStack(output, 148, 47, mouseX, mouseY);
+			this.drawFakeItemStack(output, 148, 47);
 			this.drawFakeItemStackTooltip(output, 148, 47, mouseX, mouseY);
 		}
 
@@ -118,8 +119,8 @@ public class GuiCraftingCore extends GuiContainer {
         GlStateManager.popMatrix();
 	}
 
-	private void drawFakeItemStack(ItemStack stack, int xOffset, int yOffset, int mouseX, int mouseY) {
-		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset, null);
+	private void drawFakeItemStack(ItemStack stack, int xOffset, int yOffset) {
+		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset, "");
 	}
 
 	private void drawFakeItemStackTooltip(ItemStack stack, int xOffset, int yOffset, int mouseX, int mouseY) {

@@ -1,21 +1,25 @@
 package com.blakebr0.extendedcrafting.compat.jei.combinationcrafting;
 
-import java.awt.Point;
-import java.util.List;
-
 import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
-
+import mcp.MethodsReturnNonnullByDefault;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.*;
+import java.util.List;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class CombinationCraftingCategory implements IRecipeCategory<CombinationCraftingWrapper> {
 
 	public static final String UID = "extendedcrafting:combination_crafting";
@@ -29,7 +33,7 @@ public class CombinationCraftingCategory implements IRecipeCategory<CombinationC
 
 	@Override
 	public String getUid() {
-		return this.UID;
+		return UID;
 	}
 
 	@Override
@@ -51,8 +55,8 @@ public class CombinationCraftingCategory implements IRecipeCategory<CombinationC
 	public void setRecipe(IRecipeLayout layout, CombinationCraftingWrapper wrapper, IIngredients ingredients) {
 		IGuiItemStackGroup stacks = layout.getItemStacks();
 		
-		List<List<ItemStack>> inputs = ingredients.getInputs(ItemStack.class);
-		List<ItemStack> outputs = ingredients.getOutputs(ItemStack.class).get(0);
+		List<List<ItemStack>> inputs = ingredients.getInputs(VanillaTypes.ITEM);
+		List<ItemStack> outputs = ingredients.getOutputs(VanillaTypes.ITEM).get(0);
 
 		stacks.init(0, false, 76, 149);
 		stacks.init(1, true, 76, 46);

@@ -82,7 +82,7 @@ public class BlockCompressor extends BlockBase implements ITileEntityProvider, I
 			IBlockState iblockstate1 = world.getBlockState(pos.south());
 			IBlockState iblockstate2 = world.getBlockState(pos.west());
 			IBlockState iblockstate3 = world.getBlockState(pos.east());
-			EnumFacing enumfacing = (EnumFacing) state.getValue(FACING);
+			EnumFacing enumfacing = state.getValue(FACING);
 
 			if (enumfacing == EnumFacing.NORTH && iblockstate.isFullBlock() && !iblockstate1.isFullBlock()) {
 				enumfacing = EnumFacing.SOUTH;
@@ -126,7 +126,7 @@ public class BlockCompressor extends BlockBase implements ITileEntityProvider, I
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return ((EnumFacing) state.getValue(FACING)).getIndex();
+		return state.getValue(FACING).getIndex();
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class BlockCompressor extends BlockBase implements ITileEntityProvider, I
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { FACING });
+		return new BlockStateContainer(this, FACING);
 	}
 
 	@Override

@@ -24,14 +24,14 @@ public class RenderAutomationInterface extends TileEntitySpecialRenderer<TileAut
 		
 		IBlockState state = tile.getWorld().getBlockState(tile.getPos());
 
-		if (state == null || state.getBlock() != ModBlocks.blockAutomationInterface)
+		if (state.getBlock() != ModBlocks.blockAutomationInterface)
 			return;
 
 		ItemStack stack = tile.getResult();
 		if (!stack.isEmpty()) {
 			GlStateManager.pushMatrix();
 			GlStateManager.translate(x + 0.5D, y + 0.6D, z + 0.5D);
-			float scale = (float) (stack.getItem() instanceof ItemBlock ? 0.30F : 0.35F);
+			float scale = stack.getItem() instanceof ItemBlock ? 0.30F : 0.35F;
 			GlStateManager.scale(scale, scale, scale);
 			double tick = Minecraft.getSystemTime() / 800.0D;
 			GlStateManager.rotate((float) (((tick * 40.0D) % 360)), 0, 1, 0);

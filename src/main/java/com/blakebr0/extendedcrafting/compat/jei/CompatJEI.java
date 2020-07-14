@@ -122,9 +122,9 @@ public class CompatJEI implements IModPlugin {
 
 		if (ModConfig.confCompressorEnabled) {
 			registry.addRecipeCatalyst(new ItemStack(ModBlocks.blockCompressor), CompressorCraftingCategory.UID);
-			registry.handleRecipes(CompressorRecipe.class, recipe -> new CompressorCraftingWrapper(helpers, recipe), CompressorCraftingCategory.UID);
+			registry.handleRecipes(CompressorRecipe.class, CompressorCraftingWrapper::new, CompressorCraftingCategory.UID);
 			registry.addRecipeClickArea(GuiCompressor.class, 97, 47, 21, 14, CompressorCraftingCategory.UID);
-			registry.addRecipes(CompressorRecipeManager.getInstance().getValidRecipes(), CompressorCraftingCategory.UID);
+			registry.addRecipes(CompressorRecipeManager.getInstance().getRecipes(), CompressorCraftingCategory.UID);
 		}
 		
 		if (ModConfig.confEnderEnabled) {

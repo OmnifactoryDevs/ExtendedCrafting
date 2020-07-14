@@ -57,11 +57,11 @@ public class ContainerAutomationInterface extends Container {
                     if (!this.mergeItemStack(itemstack1, 0, 1, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if(slotNumber >= 2 && slotNumber < 29) {
+                } else if(slotNumber < 29) {
                     if (!this.mergeItemStack(itemstack1, 29, 38, false)) {
                         return ItemStack.EMPTY;
                     }
-                } else if (slotNumber >= 29 && slotNumber < 38) {
+                } else if (slotNumber < 38) {
                 	if (!this.mergeItemStack(itemstack1, 2, 29, false)) {
                         return ItemStack.EMPTY;
                 	}
