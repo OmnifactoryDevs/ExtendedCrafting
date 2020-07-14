@@ -13,10 +13,12 @@ import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.text.WordUtils;
@@ -143,21 +145,21 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 					item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
 					if (item != null) {
 						stack = new ItemStack(item, 1, matMeta);
-						CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), stack.copy(), ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
+						CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), Ingredient.fromStacks(stack.copy()), ModConfig.confSingularityAmount, Ingredient.fromStacks(ItemSingularity.getCatalystStack()), false, ModConfig.confSingularityRF);
 					}
 				} else if (parts.length == 2) {
 					if (((String) value).startsWith("ore:")) {
 						String ore = ((String) value).substring(4);
 						if (OreDictionary.doesOreNameExist(ore)) {
 							if (!OreDictionary.getOres(ore).isEmpty()) {
-								CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), ore, ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
+								CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), CraftingHelper.getIngredient(ore), ModConfig.confSingularityAmount, Ingredient.fromStacks(ItemSingularity.getCatalystStack()), false, ModConfig.confSingularityRF);
 							}
 						}
 					} else {
 						item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
 						if (item != null) {
 							stack = new ItemStack(item);
-							CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), stack.copy(), ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
+							CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), Ingredient.fromStacks(stack.copy()), ModConfig.confSingularityAmount, Ingredient.fromStacks(ItemSingularity.getCatalystStack()), false, ModConfig.confSingularityRF);
 						}
 					}
 				} else {

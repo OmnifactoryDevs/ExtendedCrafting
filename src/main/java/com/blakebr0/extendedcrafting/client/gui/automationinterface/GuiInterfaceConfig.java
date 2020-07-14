@@ -13,6 +13,7 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
@@ -180,7 +181,10 @@ public class GuiInterfaceConfig extends GuiContainer {
 		return list;
 	}
 	
-	private EnumFacing incrementFace(EnumFacing facing) {
+	private EnumFacing incrementFace(@Nullable EnumFacing facing) {
+		if(facing == null) {
+			facing = EnumFacing.DOWN;
+		}
 		int index = facing.getIndex() + 1;
 		if (index > EnumFacing.values().length - 1) return null;
 		return EnumFacing.values()[index];
@@ -223,7 +227,8 @@ public class GuiInterfaceConfig extends GuiContainer {
     }
     
     public static class DirButton extends GuiButton {
-    	
+
+		@Nullable
     	public EnumFacing facing;
     	public List<String> tooltip;
     	
@@ -253,8 +258,8 @@ public class GuiInterfaceConfig extends GuiContainer {
 	            GlStateManager.popMatrix();	        }
 	    }
 		
-		private int getIndex(EnumFacing facing) {
-			return facing.getIndex();
+		private int getIndex(@Nullable EnumFacing facing) {
+			return facing == null ? EnumFacing.DOWN.getIndex() : facing.getIndex();
 		}
     }
 }

@@ -33,8 +33,9 @@ public class ExtendedCrafting {
 	@SidedProxy(clientSide = "com.blakebr0.extendedcrafting.proxy.ClientProxy", serverSide = "com.blakebr0.extendedcrafting.proxy.ServerProxy")
 	public static CommonProxy proxy;
 
+	@SuppressWarnings("CanBeFinal")
 	@Instance(ExtendedCrafting.MOD_ID)
-	public static final ExtendedCrafting instance = new ExtendedCrafting();
+	public static ExtendedCrafting instance = new ExtendedCrafting();
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

@@ -2,7 +2,6 @@ package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
-import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.endercrafter.EnderCrafterRecipeManager;
@@ -23,6 +22,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -35,13 +36,12 @@ import net.minecraftforge.items.wrapper.SidedInvWrapper;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Locale;
 
 // FIXME please
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TileAutomationInterface extends TileEntity implements ITickable, ISidedInventory {
-	
+
 	private final ItemStackHandler inventory = new StackHandler();
 	private final ItemStackHandler recipe = new FakeRecipeHandler();
 	private final EnergyStorageCustom energy = new EnergyStorageCustom(ModConfig.confInterfaceRFCapacity);
@@ -54,7 +54,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	private boolean autoEject = false;
 	private boolean smartInsert = true;
 	private int ticks = 0;
-	
+
 	@Override
 	public void update() {
 		boolean mark = false;
@@ -67,68 +67,77 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 			if (!input.isEmpty() && this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate) {
 				this.handleInput(input, hasTable && this.hasRecipe());
 			}
-			
+
 			if (hasTable && this.hasRecipe() && this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate && this.ticks % 10 == 0) {
 				this.handleOutput(output);
 			}
 
-			if (this.getInserterFace() != null && this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate && this.ticks % 4 == 0) {
-				TileEntity tile = this.getWorld().getTileEntity(this.getPos().offset(this.getInserterFace()));
-				if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN)) {
-					IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN);
-					for (int i = 0; i < handler.getSlots(); i++) {
-						ItemStack stack = handler.getStackInSlot(i);
-						if (!stack.isEmpty()) {
-							ItemStack toInsert = StackHelper.withSize(stack.copy(), 1, false);
-							if (this.checkStackSmartly(toInsert)) {
-								if (input.isEmpty() || (StackHelper.canCombineStacks(input, toInsert))) {
-									this.getInventory().insertItem(0, toInsert, false);
-									handler.extractItem(i, 1, false);
-									this.getEnergy().extractEnergy(ModConfig.confInterfaceRFRate, false);
-									break;
-								}
-							}
-						}
-					}
-				}
-			}
-			
-			if (this.getExtractorFace() != null && this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate && this.ticks % 4 == 0) {
-				TileEntity tile = this.getWorld().getTileEntity(this.getPos().offset(this.getExtractorFace()));
-				if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)) {
-					IItemHandler handler = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
-					for (int i = 0; i < handler.getSlots(); i++) {
-						ItemStack stack = handler.getStackInSlot(i);
-						if (!output.isEmpty()) {
-							ItemStack toInsert = StackHelper.withSize(output.copy(), 1, false);
-							if (stack.isEmpty() || (StackHelper.canCombineStacks(stack, toInsert))) {
-								handler.insertItem(i, toInsert, false);
-								output.shrink(1);
-								this.getEnergy().extractEnergy(ModConfig.confInterfaceRFRate, false);
-								break;
-							}
-						}
-					}
-				}
+			boolean scheduledTransfer = this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate && this.ticks % 4 == 0;
+			if (scheduledTransfer) {
+				mark = transfer(input, getInserterFace(), true);
+				mark |= transfer(output, getExtractorFace(), false);
 			}
 		}
-		
+
 		if (this.oldEnergy != this.energy.getEnergyStored()) {
 			this.oldEnergy = this.energy.getEnergyStored();
-			if (!mark) {
-				mark = true;
-			}
+			mark = true;
 		}
-		
+
 		if (this.ticks > 100) {
 			this.ticks = 0;
 		}
-		
+
 		if (mark) {
 			this.markDirty();
 		}
 	}
-	
+
+	/**
+	 * @param insert Whether this interface (or the table) is the one being inserted into. i.e. whether we need to extract.
+	 * @return {@literal true} if any kind of transfer successfully took place.
+	 */
+	private boolean transfer(ItemStack stack, @Nullable EnumFacing side, boolean insert) {
+		if (side == null || (!insert && stack.isEmpty())) {
+			return insert;
+		}
+		TileEntity tile = getWorld().getTileEntity(pos.offset(side));
+		if (tile == null) {
+			return insert;
+		}
+		IItemHandler cap = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, side.getOpposite());
+		if (cap == null) {
+			return insert;
+		}
+		for (int slot = 0; slot < cap.getSlots(); slot++) {
+			ItemStack s = cap.getStackInSlot(slot);
+			if (insert) {
+				if (s.isEmpty()) {
+					continue;
+				}
+				ItemStack toInsert = StackHelper.withSize(s.copy(), 1, false);
+				if (!this.checkStackSmartly(toInsert) || !(stack.isEmpty() || (StackHelper.canCombineStacks(stack, toInsert)))) {
+					continue;
+				}
+				ItemStack newStack = cap.extractItem(slot, 1, false);
+				if(newStack.isEmpty()) {
+					continue;
+				}
+				this.getInventory().insertItem(0, toInsert, false);
+			} else {
+				ItemStack toInsert = StackHelper.withSize(stack.copy(), 1, false);
+				ItemStack newStack = cap.insertItem(slot, toInsert, false);
+				if(!newStack.isEmpty()) {
+					continue;
+				}
+				stack.shrink(1);
+			}
+			this.getEnergy().extractEnergy(ModConfig.confInterfaceRFRate, false);
+			return true;
+		}
+		return false;
+	}
+
 	private void handleInput(ItemStack input, boolean canInsert) {
 		ItemStack output = this.getInventory().getStackInSlot(1);
 		ItemStack toInsert = StackHelper.withSize(input.copy(), 1, false);
@@ -138,6 +147,9 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 		if (canInsert) {
 			table = this.getTable();
+			if(table == null) {
+				return;
+			}
 
 			ItemStackHandler recipe = this.getRecipe();
 			matrix = (IInventory) table;
@@ -151,7 +163,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 						if (slot.isEmpty()) {
 							slotToPut = i;
 							break;
-						} else if (stackToPut.isEmpty() || (!stackToPut.isEmpty() && slot.getCount() < stackToPut.getCount())) {
+						} else if (stackToPut.isEmpty() || slot.getCount() < stackToPut.getCount()) {
 							slotToPut = i;
 							stackToPut = slot.copy();
 						}
@@ -169,21 +181,24 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 			}
 
 			this.getEnergy().extractEnergy(ModConfig.confInterfaceRFRate, false);
-		} else if (this.getAutoEject() && (output.isEmpty() || StackHelper.canCombineStacks(output, toInsert))) { 
+		} else if (this.getAutoEject() && (output.isEmpty() || StackHelper.canCombineStacks(output, toInsert))) {
 			this.getInventory().insertItem(1, toInsert, false);
 			input.shrink(1);
 			this.getEnergy().extractEnergy(ModConfig.confInterfaceRFRate, false);
 		}
 	}
-	
+
 	public void handleOutput(ItemStack output) {
 		IExtendedTable table = this.getTable();
+		if (table == null) {
+			return;
+		}
 		ItemStack result = table.getResult();
 		IInventory matrix = (IInventory) table;
-		if (!result.isEmpty() && (output.isEmpty() || StackHelper.canCombineStacks(output, result))) {				
+		if (!result.isEmpty() && (output.isEmpty() || StackHelper.canCombineStacks(output, result))) {
 			if (this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate) {
 				ItemStack toInsert = result.copy();
-				
+
 				if (this.isEnderCrafter()) {
 					table.setResult(ItemStack.EMPTY);
 				} else {
@@ -194,37 +209,37 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 							return;
 						}
 					}
-					
+
 					NonNullList<ItemStack> remaining = this.getRemainingItems(matrix);
-					
-			        for (int i = 0; i < remaining.size(); i++) {
-			            ItemStack itemstack = matrix.getStackInSlot(i);
-			            ItemStack itemstack1 = remaining.get(i);
 
-			            if (!itemstack.isEmpty()) {
-			                matrix.decrStackSize(i, 1);
-			                itemstack = matrix.getStackInSlot(i);
-			            }
+					for (int i = 0; i < remaining.size(); i++) {
+						ItemStack itemstack = matrix.getStackInSlot(i);
+						ItemStack itemstack1 = remaining.get(i);
 
-			            if (!itemstack1.isEmpty()) {
-			                if (itemstack.isEmpty()) {
-			                    matrix.setInventorySlotContents(i, itemstack1);
-			                } else if (ItemStack.areItemsEqual(itemstack, itemstack1) && ItemStack.areItemStackTagsEqual(itemstack, itemstack1)) {
-			                    itemstack1.grow(itemstack.getCount());
-			                    matrix.setInventorySlotContents(i, itemstack1);
-			                }
-			            }
-			        }
-					
+						if (!itemstack.isEmpty()) {
+							matrix.decrStackSize(i, 1);
+							itemstack = matrix.getStackInSlot(i);
+						}
+
+						if (!itemstack1.isEmpty()) {
+							if (itemstack.isEmpty()) {
+								matrix.setInventorySlotContents(i, itemstack1);
+							} else if (ItemStack.areItemsEqual(itemstack, itemstack1) && ItemStack.areItemStackTagsEqual(itemstack, itemstack1)) {
+								itemstack1.grow(itemstack.getCount());
+								matrix.setInventorySlotContents(i, itemstack1);
+							}
+						}
+					}
+
 					table.setResult(TableRecipeManager.getInstance().findMatchingRecipe(new TableCrafting(new EmptyContainer(), table), this.getWorld()));
 				}
-				
+
 				this.getInventory().insertItem(1, toInsert, false);
 				this.getEnergy().extractEnergy(ModConfig.confInterfaceRFRate, false);
 			}
 		}
 	}
-		
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);
@@ -240,7 +255,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		tag.setBoolean("SmartInsert", this.smartInsert);
 		return tag;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
@@ -255,7 +270,6 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		this.autoEject = tag.getBoolean("AutoEject");
 		this.smartInsert = tag.getBoolean("SmartInsert");
 
-		// TODO: Remove in 1.13
 		if (this.recipeSize == 0) {
 			this.recipeSize = (int) Math.sqrt(this.recipe.getSlots());
 		}
@@ -281,7 +295,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		super.markDirty();
 		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
 	}
-	
+
 	@Override
 	public int getSizeInventory() {
 		return this.inventory.getSlots();
@@ -294,7 +308,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -311,11 +325,11 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		if (index >= 0 && index < this.inventory.getSlots()) {
+			ItemStack stack = this.inventory.getStackInSlot(index);
 			this.inventory.setStackInSlot(index, ItemStack.EMPTY);
-			return ItemStack.EMPTY;
-		} else {
-			return ItemStack.EMPTY;
+			return stack;
 		}
+		return ItemStack.EMPTY;
 	}
 
 	@Override
@@ -330,7 +344,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 		if (index == 0 && !flag) {
 			this.markDirty();
-		}		
+		}
 	}
 
 	@Override
@@ -345,12 +359,12 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 	@Override
 	public void openInventory(EntityPlayer player) {
-		
+
 	}
 
 	@Override
 	public void closeInventory(EntityPlayer player) {
-		
+
 	}
 
 	@Override
@@ -365,7 +379,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 	@Override
 	public void setField(int id, int value) {
-		
+
 	}
 
 	@Override
@@ -375,12 +389,12 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 	@Override
 	public void clear() {
-		
+
 	}
 
 	@Override
 	public String getName() {
-		return null;
+		return getDisplayName().getFormattedText();
 	}
 
 	@Override
@@ -390,7 +404,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 	@Override
 	public int[] getSlotsForFace(EnumFacing side) {
-		return new int[] { 0, 1 };
+		return new int[]{0, 1};
 	}
 
 	@Override
@@ -404,77 +418,78 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	}
 
 	@Override
-	public boolean hasCapability(@Nonnull Capability<?> capability, @Nonnull EnumFacing side) {
+	public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing side) {
 		return this.getCapability(capability, side) != null;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getCapability(@Nonnull Capability<T> capability, @Nonnull EnumFacing side) {
+	public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing side) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
-			return (T) new SidedInvWrapper(this, side);
+			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(new SidedInvWrapper(this, side));
 		} else if (capability == CapabilityEnergy.ENERGY) {
 			return CapabilityEnergy.ENERGY.cast(this.energy);
 		}
-		
+
 		return super.getCapability(capability, side);
 	}
-	
+
 	public IItemHandlerModifiable getInventory() {
 		return this.inventory;
 	}
-	
+
 	public ItemStackHandler getRecipe() {
 		return this.recipe;
 	}
-	
+
 	public ItemStack getResult() {
 		return this.result;
 	}
-	
+
 	public EnergyStorageCustom getEnergy() {
 		return this.energy;
 	}
-	
+
+	@Nullable
 	public IExtendedTable getTable() {
 		TileEntity tile = this.getWorld().getTileEntity(this.getPos().down());
 		return tile instanceof IExtendedTable ? (IExtendedTable) tile : null;
 	}
-	
+
 	public boolean hasTable() {
 		IExtendedTable table = this.getTable();
 		return table != null && (!this.hasRecipe() || table.getLineSize() == this.recipeSize);
 	}
-	
+
 	public boolean isEnderCrafter() {
 		return this.getTable() instanceof TileEnderCrafter;
 	}
-	
+
 	public boolean isCraftingTable() {
 		IExtendedTable table = this.getTable();
 		return table instanceof TileBasicCraftingTable
-			|| table instanceof TileAdvancedCraftingTable
-			|| table instanceof TileEliteCraftingTable
-			|| table instanceof TileUltimateCraftingTable;
+				|| table instanceof TileAdvancedCraftingTable
+				|| table instanceof TileEliteCraftingTable
+				|| table instanceof TileUltimateCraftingTable;
 	}
-	
+
 	public boolean hasRecipe() {
 		return this.hasRecipe;
 	}
-	
+
 	public void setHasRecipe(boolean hasRecipe) {
 		this.hasRecipe = hasRecipe;
 	}
-	
+
 	public void saveRecipe() {
 		ItemStackHandler recipe = this.getRecipe();
 		IExtendedTable table = this.getTable();
+		if (table == null) return;
 		NonNullList<ItemStack> matrix = table.getMatrix();
 		recipe.setSize(matrix.size());
 		for (int i = 0; i < matrix.size(); i++) {
 			recipe.setStackInSlot(i, matrix.get(i).copy());
 		}
-		
+
 		if (this.isEnderCrafter()) {
 			TableCrafting crafting = new TableCrafting(new EmptyContainer(), table);
 			this.result = EnderCrafterRecipeManager.getInstance().findMatchingRecipe(crafting, this.getWorld()).getCraftingResult(crafting);
@@ -484,12 +499,12 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 				this.result = result;
 			}
 		}
-		
+
 		this.setHasRecipe(true);
 		this.recipeSize = table.getLineSize();
 		this.markDirty();
 	}
-	
+
 	public void clearRecipe() {
 		ItemStackHandler recipe = this.getRecipe();
 		recipe.setSize(1);
@@ -507,15 +522,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	public EnumFacing getExtractorFace() {
 		return this.autoExtract > -1 && this.autoExtract < EnumFacing.values().length ? EnumFacing.values()[this.autoExtract] : null;
 	}
-	
-	public String getInserterFaceName() {
-		return this.getInserterFace() != null ? this.getInserterFace().getName().toUpperCase(Locale.ROOT) : Utils.localize("ec.interface.none");
-	}
-	
-	public String getExtractorFaceName() {
-		return this.getExtractorFace() != null ? this.getExtractorFace().getName().toUpperCase(Locale.ROOT) : Utils.localize("ec.interface.none");
-	}
-	
+
 	public void switchInserter() {
 		if (this.autoInsert >= EnumFacing.values().length - 1) {
 			this.autoInsert = -1;
@@ -525,10 +532,10 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 				this.autoInsert++;
 			}
 		}
-		
+
 		this.markDirty();
 	}
-	
+
 	public void switchExtractor() {
 		if (this.autoExtract >= EnumFacing.values().length - 1) {
 			this.autoExtract = -1;
@@ -538,30 +545,32 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 				this.autoExtract++;
 			}
 		}
-		
+
 		this.markDirty();
 	}
-	
+
 	public void disableInserter() {
 		if (this.autoInsert != -1) {
 			this.autoInsert = -1;
 			this.markDirty();
 		}
 	}
-	
+
 	public void disableExtractor() {
 		if (this.autoExtract != -1) {
 			this.autoExtract = -1;
 			this.markDirty();
 		}
 	}
-	
+
 	public boolean checkStackSmartly(ItemStack stack) {
 		if (!this.getSmartInsert()) return true;
 		if (!this.hasTable()) return false;
 		if (!this.hasRecipe()) return false;
-		
-		NonNullList<ItemStack> matrix = this.getTable().getMatrix();
+
+		IExtendedTable table = this.getTable();
+		if (table == null) return false;
+		NonNullList<ItemStack> matrix = table.getMatrix();
 		for (int i = 0; i < matrix.size(); i++) {
 			ItemStack slotStack = matrix.get(i);
 			ItemStack recipeStack = this.getRecipe().getStackInSlot(i);
@@ -569,32 +578,32 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	public boolean getAutoEject() {
 		return this.autoEject;
 	}
-	
+
 	public void toggleAutoEject() {
 		this.autoEject = !this.autoEject;
 		this.markDirty();
 	}
-	
+
 	public boolean getSmartInsert() {
 		return this.smartInsert;
 	}
-	
+
 	public void toggleSmartInsert() {
 		this.smartInsert = !this.smartInsert;
 		this.markDirty();
 	}
-	
+
 	public boolean isUseableByPlayer(EntityPlayer player) {
 		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
 	}
-	
+
 	private void insertItem(IInventory matrix, int slot, ItemStack stack) {
 		ItemStack slotStack = matrix.getStackInSlot(slot);
 		if (slotStack.isEmpty()) {
@@ -609,18 +618,18 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		}
 
 	}
-	
+
 	private NonNullList<ItemStack> getRemainingItems(IInventory matrix) {
-        NonNullList<ItemStack> ret = NonNullList.withSize(matrix.getSizeInventory(), ItemStack.EMPTY);
-        for (int i = 0; i < ret.size(); i++) {
-            ret.set(i, ForgeHooks.getContainerItem(matrix.getStackInSlot(i)));
-        }
-        
-        return ret;
+		NonNullList<ItemStack> ret = NonNullList.withSize(matrix.getSizeInventory(), ItemStack.EMPTY);
+		for (int i = 0; i < ret.size(); i++) {
+			ret.set(i, ForgeHooks.getContainerItem(matrix.getStackInSlot(i)));
+		}
+
+		return ret;
 	}
-	
+
 	class StackHandler extends ItemStackHandler {
-		
+
 		StackHandler() {
 			super(2);
 		}
@@ -629,5 +638,11 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		public void onContentsChanged(int slot) {
 			TileAutomationInterface.this.markDirty();
 		}
+	}
+
+	@Nonnull
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TextComponentTranslation("tile.ec.interface.name");
 	}
 }

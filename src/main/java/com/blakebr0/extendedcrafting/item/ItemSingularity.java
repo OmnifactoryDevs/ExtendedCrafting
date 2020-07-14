@@ -13,9 +13,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.text.WordUtils;
 
@@ -146,11 +148,10 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 			if (value instanceof ItemStack) {
 				ItemStack stack = (ItemStack) value;
 				if (!stack.isEmpty()) {
-					CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), stack.copy(), ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
+					CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), CraftingHelper.getIngredient(value), ModConfig.confSingularityAmount, Ingredient.fromStacks(ItemSingularity.getCatalystStack()), false, ModConfig.confSingularityRF);
 				}
 			} else if (value instanceof String) {
-				String name = (String) value;
-				CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), name, ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
+				CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), CraftingHelper.getIngredient(value), ModConfig.confSingularityAmount, Ingredient.fromStacks(ItemSingularity.getCatalystStack()), false, ModConfig.confSingularityRF);
 			} else {
 				ExtendedCrafting.LOGGER.error("Invalid material for singularity: " + value.toString());
 			}
