@@ -7,12 +7,15 @@ import com.blakebr0.extendedcrafting.item.ModItems;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
 public class ECCreativeTab extends CreativeTabs {
 
 	public ECCreativeTab() {
 		super(ExtendedCrafting.MOD_ID);
 	}
 
+	@Nonnull
 	@Override
 	public ItemStack getTabIconItem() {
 		return ModConfig.confCraftingCoreEnabled ? new ItemStack(ModBlocks.blockCraftingCore) : new ItemStack(ModItems.itemMaterial);

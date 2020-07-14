@@ -1,39 +1,47 @@
 package com.blakebr0.extendedcrafting.crafting.endercrafter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.table.ITieredRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableCrafting;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShaped;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShapeless;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.CraftingHelper;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class EnderCrafterRecipeManager {
 
 	private static final EnderCrafterRecipeManager INSTANCE = new EnderCrafterRecipeManager();
-	private List recipes = new ArrayList();
+	private List<IRecipe> recipes = new ArrayList<>();
 
-	public static final EnderCrafterRecipeManager getInstance() {
+	public static EnderCrafterRecipeManager getInstance() {
 		return INSTANCE;
 	}
 
 	public TableRecipeShaped addShaped(ItemStack result, int time, Object... recipe) {
-		TableRecipeShaped craft = new TableRecipeShaped(1, result, recipe);
+		CraftingHelper.ShapedPrimer primer = CraftingHelper.parseShaped(recipe);
+		return addShaped(result, time, primer.input);
+	}
+
+	public TableRecipeShaped addShaped(ItemStack result, int time, NonNullList<Ingredient> recipe) {
+		TableRecipeShaped craft = new TableRecipeShaped(1, result, 3, 3, recipe);
 		
 		if (ModConfig.confEnderEnabled) {
 			craft.enderCrafterRecipeTimeRequired = time;
 			this.recipes.add(craft);
 		}
-		
+
 		return craft;
 	}
 	
-	public TableRecipeShapeless addShapeless(ItemStack result, int time, Object... ingredients) {
+	public TableRecipeShapeless addShapeless(ItemStack result, int time, NonNullList<Ingredient> ingredients) {
 		TableRecipeShapeless recipe = new TableRecipeShapeless(1, result, ingredients);
 		
 		if (ModConfig.confEnderEnabled) {
@@ -45,28 +53,26 @@ public class EnderCrafterRecipeManager {
 	}
 	
 	public IEnderCraftingRecipe findMatchingRecipe(TableCrafting grid, World world) {
-		for (int i = 0; i < this.recipes.size(); i++) {
-			IRecipe recipe = (IRecipe) this.recipes.get(i);
-			if (recipe.matches(grid, world)) {
-				return (IEnderCraftingRecipe) recipe;
+		for (IRecipe iRecipe : this.recipes) {
+			if (iRecipe.matches(grid, world)) {
+				return (IEnderCraftingRecipe) iRecipe;
 			}
 		}
 		
 		return null;
 	}
 
-	public List getRecipes() {
+	public List<IRecipe> getRecipes() {
 		return this.recipes;
 	}
 	
 	public void removeRecipes(ItemStack stack) {
-		this.recipes.removeIf(o -> o instanceof IRecipe && ((IRecipe) o).getRecipeOutput().isItemEqual(stack));
+		this.recipes.removeIf(o -> o != null && o.getRecipeOutput().isItemEqual(stack));
 	}
 
-	public List getRecipes(int size) {
-		List recipes = new ArrayList<>();
-		for (Object o : getRecipes()) {
-			IRecipe recipe = (IRecipe) o;
+	public List<IRecipe> getRecipes(int size) {
+		List<IRecipe> recipes = new ArrayList<>();
+		for (IRecipe recipe : getRecipes()) {
 			if (recipe.canFit(size, size)) {
 				recipes.add(recipe);
 			}
@@ -82,8 +88,8 @@ public class EnderCrafterRecipeManager {
 	 * @param tier the tier of the recipe
 	 * @return a list of recipes for this tier
 	 */
-	public List getRecipesTiered(int tier) {
-		List recipes = new ArrayList<>();
+	public List<IRecipe> getRecipesTiered(int tier) {
+		List<IRecipe> recipes = new ArrayList<>();
 		for (Object o : getRecipes()) {
 			if (o instanceof ITieredRecipe) {
 				ITieredRecipe recipe = (ITieredRecipe) o;

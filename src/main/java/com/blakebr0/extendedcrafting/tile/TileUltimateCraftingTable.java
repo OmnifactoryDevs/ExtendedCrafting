@@ -1,7 +1,7 @@
 package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -11,7 +11,14 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TileUltimateCraftingTable extends TileEntity implements IInventory, IExtendedTable {
 
 	private NonNullList<ItemStack> matrix = NonNullList.withSize(81, ItemStack.EMPTY);
@@ -78,7 +85,7 @@ public class TileUltimateCraftingTable extends TileEntity implements IInventory,
 
 	@Override
 	public String getName() {
-		return null;
+		return getDisplayName().getFormattedText();
 	}
 
 	@Override
@@ -93,7 +100,7 @@ public class TileUltimateCraftingTable extends TileEntity implements IInventory,
 
 	@Override
 	public boolean isEmpty() {
-		return !this.matrix.stream().anyMatch(s -> !s.isEmpty()) && this.result.isEmpty();
+		return this.matrix.stream().allMatch(ItemStack::isEmpty) && this.result.isEmpty();
 	}
 
 	@Override
@@ -155,5 +162,11 @@ public class TileUltimateCraftingTable extends TileEntity implements IInventory,
 	public void clear() {
 		this.matrix = NonNullList.withSize(81, ItemStack.EMPTY);
 		this.setResult(ItemStack.EMPTY);
+	}
+
+	@Nonnull
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TextComponentTranslation("tile.ec.table_ultimate.name");
 	}
 }

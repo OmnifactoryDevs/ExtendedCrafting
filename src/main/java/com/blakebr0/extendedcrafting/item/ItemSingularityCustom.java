@@ -1,11 +1,5 @@
 package com.blakebr0.extendedcrafting.item;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.text.WordUtils;
-
 import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.cucumber.iface.IEnableable;
 import com.blakebr0.cucumber.iface.IModelHelper;
@@ -14,7 +8,7 @@ import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -25,13 +19,21 @@ import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
+import org.apache.commons.lang3.text.WordUtils;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+@SuppressWarnings("UnusedReturnValue")
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEnableable {
 
 	public static ArrayList<CustomSingularity> singularities = new ArrayList<>();
 	public static Map<Integer, Integer> singularityColors = new HashMap<>();
 	public static Map<Integer, Object> singularityMaterials = new HashMap<>();
-	private Configuration config = ModConfig.instance.config;
 
 	public ItemSingularityCustom() {
 		super("ec.singularity_custom", ExtendedCrafting.REGISTRY);
@@ -80,7 +82,7 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 			int color;
 
 			try {
-				meta = Integer.valueOf(parts[0]);
+				meta = Integer.parseInt(parts[0]);
 				color = Integer.parseInt(parts[3], 16);
 			} catch (NumberFormatException e) {
 				ExtendedCrafting.LOGGER.error("Invalid custom singularity syntax ints: " + value);
@@ -123,24 +125,24 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 		for (Map.Entry<Integer, Object> obj : singularityMaterials.entrySet()) {
 			Object value = obj.getValue();
 			int meta = obj.getKey();
-			Item item = null;
-			ItemStack stack = ItemStack.EMPTY;
+			Item item;
+			ItemStack stack;
 			if (value instanceof String) {
 				if ("none".equalsIgnoreCase((String) value)) {
 					continue;
 				}
 				String[] parts = ((String) value).split(":");
-				int matMeta = 0;
+				int matMeta;
 				if (parts.length == 3) {
 					try {
-						matMeta = Integer.valueOf(parts[2]);
+						matMeta = Integer.parseInt(parts[2]);
 					} catch (NumberFormatException e) {
 						ExtendedCrafting.LOGGER.error("Invalid meta for singularity: " + value.toString());
 						continue;
 					}
 					item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
-					stack = new ItemStack(item, 1, matMeta);
-					if (!stack.isEmpty()) {
+					if (item != null) {
+						stack = new ItemStack(item, 1, matMeta);
 						CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), stack.copy(), ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
 					}
 				} else if (parts.length == 2) {
@@ -153,23 +155,21 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 						}
 					} else {
 						item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(parts[0], parts[1]));
-						stack = new ItemStack(item);
-						if (!stack.isEmpty()) {
+						if (item != null) {
+							stack = new ItemStack(item);
 							CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), stack.copy(), ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
 						}
 					}
 				} else {
 					ExtendedCrafting.LOGGER.error("Invalid material for singularity: " + value.toString());
-					continue;
 				}
 			} else {
 				ExtendedCrafting.LOGGER.error("Invalid material for singularity: " + value.toString());
-				continue;
 			}
 		}
 	}
 
-	public class CustomSingularity {
+	public static class CustomSingularity {
 
 		public int meta;
 		public String name;

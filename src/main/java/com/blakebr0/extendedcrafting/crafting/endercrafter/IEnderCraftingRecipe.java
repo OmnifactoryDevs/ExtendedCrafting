@@ -1,5 +1,7 @@
 package com.blakebr0.extendedcrafting.crafting.endercrafter;
 
-public interface IEnderCraftingRecipe {
+import net.minecraft.item.crafting.IRecipe;
+
+public interface IEnderCraftingRecipe extends IRecipe {
 	int getEnderCrafterTimeSeconds();
 }

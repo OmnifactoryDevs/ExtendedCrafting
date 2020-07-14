@@ -1,19 +1,19 @@
 package com.blakebr0.extendedcrafting.item;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.blakebr0.cucumber.item.ItemMeta;
 import com.blakebr0.cucumber.lib.Colors;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
-
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+
+import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class ItemMaterial extends ItemMeta {
 	
@@ -111,7 +111,8 @@ public class ItemMaterial extends ItemMeta {
 	public boolean hasEffect(ItemStack stack) {
 		return ultimateMetas.contains(stack.getMetadata());
 	}
-	
+
+	@Nonnull
 	@Override
 	public EnumRarity getRarity(ItemStack stack) {
 		return ultimateMetas.contains(stack.getMetadata()) ? EnumRarity.EPIC : EnumRarity.COMMON;

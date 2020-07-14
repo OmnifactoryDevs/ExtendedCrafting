@@ -1,80 +1,29 @@
 package com.blakebr0.extendedcrafting.crafting.table;
 
+import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.NonNullList;
+import net.minecraft.world.World;
+import net.minecraftforge.items.IItemHandlerModifiable;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.blakebr0.cucumber.helper.RecipeHelper;
-import com.blakebr0.cucumber.helper.StackHelper;
-import com.blakebr0.extendedcrafting.config.ModConfig;
-import com.blakebr0.extendedcrafting.crafting.endercrafter.IEnderCraftingRecipe;
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+@SuppressWarnings("unused")
+public class TableRecipeShaped extends TableRecipeBase {
 
-import net.minecraft.block.Block;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.CraftingHelper.ShapedPrimer;
-import net.minecraftforge.items.IItemHandlerModifiable;
-
-public class TableRecipeShaped implements IRecipe, ITieredRecipe, IEnderCraftingRecipe  {
-
-	public static final int MAX_CRAFT_GRID_WIDTH = 9;
-	public static final int MAX_CRAFT_GRID_HEIGHT = 9;
-
-	protected ItemStack output = ItemStack.EMPTY;
-	protected NonNullList<Ingredient> input = null;
-	protected int width = 0;
-	protected int height = 0;
-	protected boolean mirrored = true;
-	protected ResourceLocation group;
-	protected int tier;
-	protected Map<Integer, Function<ItemStack, ItemStack>> transformers;
-	public int enderCrafterRecipeTimeRequired = ModConfig.confEnderTimeRequired;
-
-	public TableRecipeShaped(int tier, Block result, Object... recipe) {
-		this(tier, new ItemStack(result), recipe);
-	}
-
-	public TableRecipeShaped(int tier, Item result, Object... recipe) {
-		this(tier, new ItemStack(result), recipe);
-	}
-
-	public TableRecipeShaped(int tier, ItemStack result, Object... recipe) {
-		this(tier, result, CraftingHelper.parseShaped(recipe));
-	}
-
-	public TableRecipeShaped(int tier, ItemStack result, ShapedPrimer primer) {
-		this.group = RecipeHelper.EMPTY_GROUP;
-		this.output = result.copy();
-		this.width = primer.width;
-		this.height = primer.height;
-		this.input = primer.input;
-		this.mirrored = primer.mirrored;
-		this.tier = tier;
-	}
+	protected int width;
+	protected int height;
 
 	public TableRecipeShaped(int tier, ItemStack result, int width, int height, NonNullList<Ingredient> ingredients) {
-		this.group = RecipeHelper.EMPTY_GROUP;
-		this.output = result.copy();
+		super(tier, result, ingredients);
 		this.width = width;
 		this.height = height;
-		this.input = ingredients;
-		this.tier = tier;
-	}
-
-	@Override
-	public ItemStack getCraftingResult(InventoryCrafting var1) {
-		return this.output.copy();
-	}
-
-	@Override
-	public ItemStack getRecipeOutput() {
-		return this.output;
 	}
 
 	@Override
@@ -114,17 +63,6 @@ public class TableRecipeShaped implements IRecipe, ITieredRecipe, IEnderCrafting
 
 				if (!target.apply(inv.getStackInRowAndColumn(x, y))) {
 					return false;
-				} else {
-					boolean valid = false;
-					if (target.getMatchingStacks().length == 0) valid = true;
-					
-					for (ItemStack stack : target.getMatchingStacks()) {
-						if (StackHelper.compareTags(stack, inv.getStackInRowAndColumn(x, y))) {
-							valid = true;
-						}
-					}
-					
-					if (!valid) return false;
 				}
 			}
 		}
@@ -183,11 +121,6 @@ public class TableRecipeShaped implements IRecipe, ITieredRecipe, IEnderCrafting
 		return this;
 	}
 
-	@Override
-	public NonNullList<Ingredient> getIngredients() {
-		return this.input;
-	}
-
 	public int getWidth() {
 		return this.width;
 	}
@@ -197,84 +130,22 @@ public class TableRecipeShaped implements IRecipe, ITieredRecipe, IEnderCrafting
 	}
 
 	@Override
-	public String getGroup() {
-		return this.group == null ? "" : this.group.toString();
-	}
-
-	@Override
 	public boolean canFit(int width, int height) {
 		return width >= this.width && height >= this.height;
 	}
 
 	@Override
-	public IRecipe setRegistryName(ResourceLocation name) {
-		return null;
-	}
-
-	@Override
-	public ResourceLocation getRegistryName() {
-		return null;
-	}
-
-	@Override
-	public Class<IRecipe> getRegistryType() {
-		return null;
-	}
-	
-	private int getTierFromSize(int size) {
-		int tier = size < 10 ? 1
-				 : size < 26 && size > 9 ? 2
-				 : size < 50 && size > 25 ? 3
-				 : 4;
-				 
-		return tier;
-	}
-
-	private int getTierFromGridSize(InventoryCrafting inv) {
-		int size = inv.getSizeInventory();
-		int tier = size < 10 ? 1
-				 : size < 26 && size > 9 ? 2
-				 : size < 50 && size > 25 ? 3
-				 : 4;
-				 
-		return tier;
-	}
-
-	@Override
 	public int getTier() {
 		if (this.tier > 0) return this.tier;
-			
-		int tier = (this.width < 4 && this.height < 4) ? 1
-				 : ((this.width > 3 || this.height > 3) && this.width < 6 && this.height < 6) ? 2
-				 : ((this.width > 5 || this.height > 5) && this.width < 8 && this.height < 8) ? 3
+
+		return this.width < 4 && this.height < 4 ? 1
+				 : this.width < 6 && this.height < 6 ? 2
+				 : this.width < 8 && this.height < 8 ? 3
 				 : 4;
-		
-		return tier;
-	}
-	
-	public boolean requiresTier() {
-		return this.tier > 0;
-	}
-	
-	@Override
-	public int getEnderCrafterTimeSeconds() {
-		return this.enderCrafterRecipeTimeRequired;
 	}
 	
 	public TableRecipeShaped withTransformers(Map<Integer, Function<ItemStack, ItemStack>> transformers) {
 		this.transformers = transformers;
 		return this;
-	}
-	
-	@Override
-	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
-		NonNullList<ItemStack> remaining = IRecipe.super.getRemainingItems(inv);
-		if (this.transformers != null && !this.transformers.isEmpty()) {
-			this.transformers.forEach((i, transformer) -> {
-				remaining.set(i, transformer.apply(inv.getStackInSlot(i)));
-			});
-		}
-		
-		return remaining;
 	}
 }

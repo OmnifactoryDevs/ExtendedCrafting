@@ -1,29 +1,25 @@
 package com.blakebr0.extendedcrafting.compat.crafttweaker;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
+import com.blakebr0.extendedcrafting.crafting.table.ITieredRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShaped;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShapeless;
-
 import crafttweaker.CraftTweakerAPI;
 import crafttweaker.IAction;
 import crafttweaker.api.item.IIngredient;
 import crafttweaker.api.item.IItemStack;
-import crafttweaker.api.item.IngredientItem;
 import crafttweaker.api.minecraft.CraftTweakerMC;
-import crafttweaker.api.oredict.IOreDictEntry;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.function.Function;
 
 @ZenClass("mods.extendedcrafting.TableCrafting")
 public class TableCrafting {
@@ -35,45 +31,7 @@ public class TableCrafting {
 
 	@ZenMethod
 	public static void addShaped(int tier, IItemStack output, IIngredient[][] ingredients) {
-		if (tier > 4 || tier < 0) {
-			CraftTweakerAPI.getLogger().logError("Unable to assign a tier to the Table Recipe for stack " + output.getDisplayName() + ". Tier cannot be greater than 4 or less than 0.");
-			tier = 0;
-		}
-
-		int height = ingredients.length;
-		int width = 0;
-		for (IIngredient[] row : ingredients) {
-			if (width < row.length) {
-				width = row.length;
-			}
-		}
-			
-		NonNullList<Ingredient> input = NonNullList.withSize(height * width, Ingredient.EMPTY);
-		Map<Integer, Function<ItemStack, ItemStack>> transformers = new HashMap<>();
-		
-		int i = 0;
-		for (int a = 0; a < height; a++) {
-			for (int b = 0; b < ingredients[a].length; b++) {
-				IIngredient iing = ingredients[a][b];
-				Ingredient ing = CraftingHelper.getIngredient(toObject(iing));
-				if (ing == null) {
-					ing = Ingredient.EMPTY;
-				}
-				
-				i = a * width + b;
-				input.set(i, ing);
-				
-				if (ing != Ingredient.EMPTY && iing.hasNewTransformers()) {
-					transformers.put(i, stack -> {
-						IItemStack istack = iing.applyNewTransform(CraftTweakerMC.getIItemStack(stack));
-						ItemStack transformed = CraftTweakerMC.getItemStack(istack);
-						return transformed;
-					});
-				}
-			}
-		}
-
-		CraftTweakerAPI.apply(new Add(new TableRecipeShaped(tier, toStack(output), width, height, input).withTransformers(transformers)));
+		CraftTweakerAPI.apply(new Add(makeShaped(tier, output, ingredients)));
 	}
 
 	@ZenMethod
@@ -83,45 +41,48 @@ public class TableCrafting {
 
 	@ZenMethod
 	public static void addShapedMirrored(int tier, IItemStack output, IIngredient[][] ingredients) {
-		if (tier > 4 || tier < 0) {
-			CraftTweakerAPI.getLogger().logError("Unable to assign a tier to the Table Recipe for stack " + output.getDisplayName() + ". Tier cannot be greater than 4 or less than 0.");
-			tier = 0;
-		}
+		TableRecipeShaped recipe = makeShaped(tier, output, ingredients);
 
-		int height = ingredients.length;
-		int width = 0;
-		for (IIngredient[] row : ingredients) {
-			if (width < row.length) {
-				width = row.length;
+		CraftTweakerAPI.apply(new Add(recipe.setMirrored(true)));
+	}
+
+	private static TableRecipeShaped makeShaped(int tier, IItemStack output, IIngredient[][] ingredients) {
+		TableRecipeShaped recipe;
+		{
+			if (tier > 4 || tier < 0) {
+				CraftTweakerAPI.getLogger().logError("Unable to assign a tier to the Table Recipe for stack " + output.getDisplayName() + ". Tier cannot be greater than 4 or less than 0.");
+				tier = 0;
 			}
-		}
 
-		NonNullList<Ingredient> input = NonNullList.withSize(height * width, Ingredient.EMPTY);
-		Map<Integer, Function<ItemStack, ItemStack>> transformers = new HashMap<>();
-
-		int i = 0;
-		for (int a = 0; a < height; a++) {
-			for (int b = 0; b < ingredients[a].length; b++) {
-				IIngredient iing = ingredients[a][b];
-				Ingredient ing = CraftingHelper.getIngredient(toObject(iing));
-				if (ing == null) {
-					ing = Ingredient.EMPTY;
+			int height = ingredients.length;
+			int width = 0;
+			for (IIngredient[] row : ingredients) {
+				if (width < row.length) {
+					width = row.length;
 				}
-				
-				i = a * width + b;
-				input.set(i, ing);
-				
+			}
+
+			NonNullList<Ingredient> input = NonNullList.withSize(height * width, Ingredient.EMPTY);
+			Map<Integer, Function<ItemStack, ItemStack>> transformers = new HashMap<>();
+
+			int i = 0;
+			for (Iterator<IIngredient> it = Arrays.stream(ingredients)
+					.flatMap(Arrays::stream)
+					.iterator(); it.hasNext(); ) {
+				IIngredient iing = it.next();
+				Ingredient ing = CraftTweakerUtils.toIngredient(iing);
+				input.set(i++, ing);
 				if (ing != Ingredient.EMPTY && iing.hasNewTransformers()) {
 					transformers.put(i, stack -> {
 						IItemStack istack = iing.applyNewTransform(CraftTweakerMC.getIItemStack(stack));
-						ItemStack transformed = CraftTweakerMC.getItemStack(istack);
-						return transformed;
+						return CraftTweakerMC.getItemStack(istack);
 					});
 				}
 			}
-		}
 
-		CraftTweakerAPI.apply(new Add(new TableRecipeShaped(tier, toStack(output), width, height, input).setMirrored(true).withTransformers(transformers)));
+			recipe = new TableRecipeShaped(tier, CraftTweakerMC.getItemStack(output), width, height, input).withTransformers(transformers);
+		}
+		return recipe;
 	}
 
 
@@ -136,33 +97,34 @@ public class TableCrafting {
 			CraftTweakerAPI.getLogger().logError("Unable to assign a tier to the Table Recipe for stack " + output.getDisplayName() + ". Tier cannot be greater than 4 or less than 0.");
 			tier = 0;
 		}
-		
+
+		NonNullList<Ingredient> input = NonNullList.withSize(ingredients.length, Ingredient.EMPTY);
 		Map<Integer, Function<ItemStack, ItemStack>> transformers = new HashMap<>();
 
 		for (int i = 0; i < ingredients.length; i++) {
 			IIngredient iing = ingredients[i];
-			Ingredient ing = CraftingHelper.getIngredient(toObject(iing));
+			Ingredient ing = CraftTweakerUtils.toIngredient(iing);
+			input.set(i, ing);
 			if (ing != Ingredient.EMPTY && iing.hasNewTransformers()) {
 				transformers.put(i, stack -> {
 					IItemStack istack = iing.applyNewTransform(CraftTweakerMC.getIItemStack(stack));
-					ItemStack transformed = CraftTweakerMC.getItemStack(istack);
-					return transformed;
+					return CraftTweakerMC.getItemStack(istack);
 				});
 			}
 		}
 
-		CraftTweakerAPI.apply(new Add(new TableRecipeShapeless(tier, toStack(output), toObjects(ingredients)).withTransforms(transformers)));
+		CraftTweakerAPI.apply(new Add(new TableRecipeShapeless(tier, CraftTweakerMC.getItemStack(output), input).withTransforms(transformers)));
 	}
 
 	@ZenMethod
 	public static void remove(IItemStack target) {
-		CraftTweakerAPI.apply(new Remove(toStack(target)));
+		CraftTweakerAPI.apply(new Remove(CraftTweakerMC.getItemStack(target)));
 	}
 
 	private static class Add implements IAction {
-		IRecipe recipe;
+		ITieredRecipe recipe;
 
-		public Add(IRecipe add) {
+		public Add(ITieredRecipe add) {
 			this.recipe = add;
 		}
 
@@ -193,53 +155,5 @@ public class TableCrafting {
 		public String describe() {
 			return "Removing all Table Crafting recipes for " + this.remove.getDisplayName();
 		}
-	}
-
-	private static ItemStack toStack(IItemStack item) {
-		if (item == null) {
-			return ItemStack.EMPTY;
-		} else {
-			Object internal = item.getInternal();
-			if (internal == null || !(internal instanceof ItemStack)) {
-				CraftTweakerAPI.getLogger().logError("Not a valid item stack: " + item);
-			}
-			return (ItemStack) internal;
-		}
-	}
-
-	private static Object toObject(IIngredient ingredient) {
-		if (ingredient == null) {
-			return null;
-		} else {			
-			if (ingredient instanceof IOreDictEntry) {
-				return toString((IOreDictEntry) ingredient);
-			} else if (ingredient instanceof IItemStack) {				
-				return toStack((IItemStack) ingredient);
-			} else if (ingredient instanceof IngredientItem) {
-				return ingredient.getInternal();
-			} else {
-				return null;
-			}
-		}
-	}
-
-	private static Object[] toObjects(IIngredient[] list) {
-		if (list == null)
-			return null;
-		
-		Object[] ingredients = new Object[list.length];
-		for (int x = 0; x < list.length; x++) {
-			ingredients[x] = toObject(list[x]);
-		}
-		
-		return ingredients;
-	}
-
-	private static List toList(IIngredient[] list) {
-		return Arrays.asList(toObjects(list));
-	}
-
-	private static String toString(IOreDictEntry entry) {
-		return ((IOreDictEntry) entry).getName();
 	}
 }

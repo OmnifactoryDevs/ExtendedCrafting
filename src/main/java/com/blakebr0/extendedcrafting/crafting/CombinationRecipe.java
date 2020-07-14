@@ -1,17 +1,16 @@
 package com.blakebr0.extendedcrafting.crafting;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.config.ModConfig;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CombinationRecipe {
 
@@ -55,14 +54,14 @@ public class CombinationRecipe {
 			} else if (obj instanceof List) {
 				this.pedestals.add(obj);
 			} else {
-				String ret = "Invalid combination crafting recipe: ";
+				StringBuilder ret = new StringBuilder("Invalid combination crafting recipe: ");
 				for (Object tmp : pedestals) {
-					ret += tmp + ", ";
+					ret.append(tmp).append(", ");
 				}
 				
-				ret += this.output;
+				ret.append(this.output);
 				
-				throw new RuntimeException(ret);
+				throw new RuntimeException(ret.toString());
 			}
 		}
 		
@@ -86,7 +85,7 @@ public class CombinationRecipe {
 		return this.input;
 	}
 
-	public ArrayList<Object> getPedestalItems() {
+	public ArrayList<Object> getPedestalItems() { // FIXME use Ingredients
 		return this.pedestals;
 	}
 	

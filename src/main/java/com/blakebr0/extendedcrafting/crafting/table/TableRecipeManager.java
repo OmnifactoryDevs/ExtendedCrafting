@@ -1,34 +1,39 @@
 package com.blakebr0.extendedcrafting.crafting.table;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blakebr0.extendedcrafting.config.ModConfig;
-
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class TableRecipeManager {
 
 	private static final TableRecipeManager INSTANCE = new TableRecipeManager();
-	private List recipes = new ArrayList();
+	private List<ITieredRecipe> recipes = new ArrayList<>();
 
-	public static final TableRecipeManager getInstance() {
+	public static TableRecipeManager getInstance() {
 		return INSTANCE;
 	}
 
 	public TableRecipeShaped addShaped(ItemStack result, Object... recipe) {
-		return addShaped(0, result, recipe);
+		CraftingHelper.ShapedPrimer primer = CraftingHelper.parseShaped(recipe);
+		return addShaped(0, result, primer.width, primer.height, primer.input);
 	}
 
-	public TableRecipeShaped addShaped(int tier, ItemStack result, Object... recipe) {
-		TableRecipeShaped craft = new TableRecipeShaped(tier, result, recipe);
+	public TableRecipeShaped addShaped(int tier, ItemStack result, int width, int height, NonNullList<Ingredient> recipe) {
+		TableRecipeShaped craft = new TableRecipeShaped(tier, result, width, height, recipe);
 		
 		if (ModConfig.confTableEnabled) {
 			this.recipes.add(craft);
@@ -37,18 +42,26 @@ public class TableRecipeManager {
 		return craft;
 	}
 
-	public TableRecipeShapeless addShapeless(ItemStack result, Object... ingredients) {
+	public TableRecipeShapeless addShapeless(ItemStack result, NonNullList<Ingredient> ingredients) {
 		return addShapeless(0, result, ingredients);
 	}
 
-	public TableRecipeShapeless addShapeless(int tier, ItemStack result, Object... ingredients) {
+	public TableRecipeShapeless addShapeless(int tier, ItemStack result, NonNullList<Ingredient> ingredients) {
 		TableRecipeShapeless recipe = new TableRecipeShapeless(tier, result, ingredients);
-		
+
 		if (ModConfig.confTableEnabled) {
 			this.recipes.add(recipe);
 		}
-		
+
 		return recipe;
+	}
+
+	@Deprecated
+	public TableRecipeShapeless addShapeless(ItemStack result, Object... ingredients) {
+		NonNullList<Ingredient> ing = Arrays.stream(ingredients)
+				.map(CraftingHelper::getIngredient)
+				.collect(Collectors.toCollection(NonNullList::create));
+		return addShapeless(0, result, ing);
 	}
 
 	public ItemStack findMatchingRecipe(InventoryCrafting grid, World world) {
@@ -73,10 +86,11 @@ public class TableRecipeManager {
 
 		if (i == 2 && stack.getItem() == stack1.getItem() && stack.getCount() == 1 && stack1.getCount() == 1 && stack.getItem().isRepairable()) {
 			Item item = stack.getItem();
-			int j1 = item.getMaxDamage() - stack.getItemDamage();
-			int k = item.getMaxDamage() - stack1.getItemDamage();
-			int l = j1 + k + item.getMaxDamage() * 5 / 100;
-			int i1 = item.getMaxDamage() - l;
+			int maxDamage = stack.getMaxDamage();
+			int j1 = maxDamage - stack.getItemDamage();
+			int k = maxDamage - stack1.getItemDamage();
+			int l = j1 + k + maxDamage * 5 / 100;
+			int i1 = maxDamage - l;
 
 			if (i1 < 0) {
 				i1 = 0;
@@ -84,8 +98,7 @@ public class TableRecipeManager {
 			
 			return new ItemStack(stack.getItem(), 1, i1);
 		} else {
-			for (int j = 0; j < this.recipes.size(); j++) {
-				IRecipe recipe = (IRecipe) this.recipes.get(j);
+			for (IRecipe recipe : this.recipes) {
 				if (recipe.matches(grid, world)) {
 					return recipe.getCraftingResult(grid);
 				}
@@ -103,20 +116,19 @@ public class TableRecipeManager {
 		}
 	}
 
-	public List getRecipes() {
+	public List<ITieredRecipe> getRecipes() {
 		return this.recipes;
 	}
 	
 	public void removeRecipes(ItemStack stack) {
-		this.recipes.removeIf(o -> o instanceof IRecipe && ((IRecipe) o).getRecipeOutput().isItemEqual(stack));
+		this.recipes.removeIf(recipe -> recipe != null && recipe.getRecipeOutput().isItemEqual(stack));
 	}
 
-	public List getRecipes(int size) {
-		List recipes = new ArrayList<>();
-		for (Object o : this.getRecipes()) {
-			IRecipe recipe = (IRecipe) o;
-			if (recipe.canFit(size, size)) {
-				recipes.add(recipe);
+	public List<IRecipe> getRecipes(int size) {
+		List<IRecipe> recipes = new ArrayList<>();
+		for (IRecipe r : this.getRecipes()) {
+			if (r.canFit(size, size)) {
+				recipes.add(r);
 			}
 		}
 		
@@ -130,13 +142,12 @@ public class TableRecipeManager {
 	 * @param tier the tier of the recipe
 	 * @return a list of recipes for this tier
 	 */
-	public List getRecipesTiered(int tier) {
-		List recipes = new ArrayList<>();
-		for (Object o : this.getRecipes()) {
-			if (o instanceof ITieredRecipe) {
-				ITieredRecipe recipe = (ITieredRecipe) o;
-				if (recipe.getTier() == tier) {
-					recipes.add(recipe);
+	public List<ITieredRecipe> getRecipesTiered(int tier) {
+		List<ITieredRecipe> recipes = new ArrayList<>();
+		for (ITieredRecipe r : this.getRecipes()) {
+			if (r != null) {
+				if (r.getTier() == tier) {
+					recipes.add(r);
 				}
 			}
 		}
@@ -146,7 +157,7 @@ public class TableRecipeManager {
 	
     public static NonNullList<ItemStack> getRemainingItems(InventoryCrafting grid, World world) {
 		for (int j = 0; j < getInstance().recipes.size(); j++) {
-			IRecipe recipe = (IRecipe) getInstance().recipes.get(j);
+			IRecipe recipe = getInstance().recipes.get(j);
 			if (recipe.matches(grid, world)) {
 				return recipe.getRemainingItems(grid);
 			}

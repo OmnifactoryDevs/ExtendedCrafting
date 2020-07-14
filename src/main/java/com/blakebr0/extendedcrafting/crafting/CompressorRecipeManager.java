@@ -1,19 +1,19 @@
 package com.blakebr0.extendedcrafting.crafting;
 
-import java.util.ArrayList;
-
 import com.blakebr0.extendedcrafting.config.ModConfig;
-
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
+import java.util.ArrayList;
+
+@SuppressWarnings("unused")
 public class CompressorRecipeManager {
 
 	private static final CompressorRecipeManager INSTANCE = new CompressorRecipeManager();
 
-	private ArrayList<CompressorRecipe> recipes = new ArrayList<CompressorRecipe>();
+	private ArrayList<CompressorRecipe> recipes = new ArrayList<>();
 
-	public static final CompressorRecipeManager getInstance() {
+	public static CompressorRecipeManager getInstance() {
 		return INSTANCE;
 	}
 	
@@ -34,11 +34,9 @@ public class CompressorRecipeManager {
 	}
 	
 	public ArrayList<CompressorRecipe> getValidRecipes() {
-		ArrayList recipes = new ArrayList<>();
+		ArrayList<CompressorRecipe> recipes = new ArrayList<>();
 		for (CompressorRecipe recipe : getRecipes()) {
-			if (recipe.getInput() instanceof NonNullList<?> && ((NonNullList<?>) recipe.getInput()).isEmpty()) {
-				continue;
-			} else {
+			if (!(recipe.getInput() instanceof NonNullList<?>) || !((NonNullList<?>) recipe.getInput()).isEmpty()) {
 				recipes.add(recipe);
 			}
 		}

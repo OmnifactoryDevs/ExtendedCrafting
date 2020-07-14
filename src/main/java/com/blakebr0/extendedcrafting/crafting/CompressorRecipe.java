@@ -1,13 +1,12 @@
 package com.blakebr0.extendedcrafting.crafting;
 
-import java.util.List;
-
 import com.blakebr0.extendedcrafting.config.ModConfig;
-
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
+
+import java.util.List;
 
 public class CompressorRecipe {
 
@@ -51,7 +50,7 @@ public class CompressorRecipe {
 		return this.output.copy();
 	}
 
-	public Object getInput() {
+	public Object getInput() { // FIXME use Ingredients
 		return this.input;
 	}
 

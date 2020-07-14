@@ -2,9 +2,13 @@ package com.blakebr0.extendedcrafting.crafting.table;
 
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+
+@MethodsReturnNonnullByDefault
 public class TableCraftResult extends InventoryCraftResult {
 
 	private IExtendedTable tile;
@@ -22,16 +26,15 @@ public class TableCraftResult extends InventoryCraftResult {
 	public ItemStack decrStackSize(int slot, int decrement) {
 		ItemStack stack = this.tile.getResult();
 		if (!stack.isEmpty()) {
-			ItemStack resultStack = stack;
 			this.tile.setResult(ItemStack.EMPTY);
-			return resultStack;
+			return stack;
 		} else {
 			return ItemStack.EMPTY;
 		}
 	}
 
 	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack) {
+	public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
 		this.tile.setResult(stack);
 	}
 }

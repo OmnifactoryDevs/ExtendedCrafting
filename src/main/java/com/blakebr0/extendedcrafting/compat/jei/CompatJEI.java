@@ -1,36 +1,16 @@
 package com.blakebr0.extendedcrafting.compat.jei;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.block.ModBlocks;
-import com.blakebr0.extendedcrafting.client.container.ContainerAdvancedTable;
-import com.blakebr0.extendedcrafting.client.container.ContainerBasicTable;
-import com.blakebr0.extendedcrafting.client.container.ContainerEliteTable;
-import com.blakebr0.extendedcrafting.client.container.ContainerEnderCrafter;
-import com.blakebr0.extendedcrafting.client.container.ContainerHandheldTable;
-import com.blakebr0.extendedcrafting.client.container.ContainerUltimateTable;
-import com.blakebr0.extendedcrafting.client.gui.GuiAdvancedTable;
-import com.blakebr0.extendedcrafting.client.gui.GuiBasicTable;
-import com.blakebr0.extendedcrafting.client.gui.GuiCompressor;
-import com.blakebr0.extendedcrafting.client.gui.GuiCraftingCore;
-import com.blakebr0.extendedcrafting.client.gui.GuiEliteTable;
-import com.blakebr0.extendedcrafting.client.gui.GuiEnderCrafter;
-import com.blakebr0.extendedcrafting.client.gui.GuiHandheldTable;
-import com.blakebr0.extendedcrafting.client.gui.GuiUltimateTable;
+import com.blakebr0.extendedcrafting.client.container.*;
+import com.blakebr0.extendedcrafting.client.gui.*;
 import com.blakebr0.extendedcrafting.compat.jei.combinationcrafting.CombinationCraftingCategory;
 import com.blakebr0.extendedcrafting.compat.jei.combinationcrafting.CombinationCraftingWrapper;
 import com.blakebr0.extendedcrafting.compat.jei.compressor.CompressorCraftingCategory;
 import com.blakebr0.extendedcrafting.compat.jei.compressor.CompressorCraftingWrapper;
 import com.blakebr0.extendedcrafting.compat.jei.endercrafter.EnderCrafterCategory;
-import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.AdvancedTableCategory;
-import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.BasicTableCategory;
-import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.EliteTableCategory;
-import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.TableShapedWrapper;
-import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.TableShapelessWrapper;
-import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.UltimateTableCategory;
+import com.blakebr0.extendedcrafting.compat.jei.tablecrafting.*;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipe;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipeManager;
@@ -41,12 +21,8 @@ import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShaped;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShapeless;
 import com.blakebr0.extendedcrafting.item.ModItems;
-
-import mezz.jei.api.IGuiHelper;
-import mezz.jei.api.IJeiHelpers;
-import mezz.jei.api.IModPlugin;
-import mezz.jei.api.IModRegistry;
-import mezz.jei.api.JEIPlugin;
+import mezz.jei.api.*;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.transfer.IRecipeTransferRegistry;
@@ -55,13 +31,16 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @JEIPlugin
 public class CompatJEI implements IModPlugin {
 
 	public static final ResourceLocation ICONS = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/jei/icons.png");
 	
-	public static List<Block> blocks = new ArrayList<Block>();
-	public static List<Item> items = new ArrayList<Item>();
+	public static List<Block> blocks = new ArrayList<>();
+	public static List<Item> items = new ArrayList<>();
 	
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registry) {
@@ -89,8 +68,8 @@ public class CompatJEI implements IModPlugin {
 	
 	@Override
 	public void register(IModRegistry registry) {
-		blocks.forEach(block -> registry.addIngredientInfo(new ItemStack(block), ItemStack.class, "desc." + block.getUnlocalizedName()));
-		items.forEach(item -> registry.addIngredientInfo(new ItemStack(item), ItemStack.class, "desc." + item.getUnlocalizedName()));
+		blocks.forEach(block -> registry.addIngredientInfo(new ItemStack(block), VanillaTypes.ITEM, "desc." + block.getUnlocalizedName()));
+		items.forEach(item -> registry.addIngredientInfo(new ItemStack(item), VanillaTypes.ITEM, "desc." + item.getUnlocalizedName()));
 		
 		IJeiHelpers helpers = registry.getJeiHelpers();
 		IRecipeTransferRegistry transfer = registry.getRecipeTransferRegistry();

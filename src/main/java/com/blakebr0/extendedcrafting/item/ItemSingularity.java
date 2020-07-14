@@ -1,11 +1,5 @@
 package com.blakebr0.extendedcrafting.item;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang3.text.WordUtils;
-
 import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.cucumber.iface.IEnableable;
 import com.blakebr0.cucumber.item.ItemMeta;
@@ -13,7 +7,7 @@ import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
@@ -23,12 +17,21 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import org.apache.commons.lang3.text.WordUtils;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+@SuppressWarnings("UnusedReturnValue")
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class ItemSingularity extends ItemMeta implements IEnableable {
 
 	public static Map<Integer, Integer> singularityColors = new HashMap<>();
 	public static Map<Integer, Object> singularityMaterials = new HashMap<>();
-	private Configuration config = ModConfig.instance.config;
+	private Configuration config = ModConfig.config;
 
 	public ItemSingularity() {
 		super("ec.singularity", ExtendedCrafting.REGISTRY);
@@ -150,7 +153,6 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 				CompressorRecipeManager.getInstance().addRecipe(new ItemStack(this, 1, meta), name, ModConfig.confSingularityAmount, ItemSingularity.getCatalystStack(), false, ModConfig.confSingularityRF);
 			} else {
 				ExtendedCrafting.LOGGER.error("Invalid material for singularity: " + value.toString());
-				continue;
 			}
 		}
 	}
@@ -158,12 +160,12 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 	public static ItemStack getCatalystStack() {
 		String[] parts = ModConfig.confSingularityCatalyst.split(":");
 		if (parts.length != 3) {
-			return ModItems.itemMaterial.itemUltimateCatalyst;
+			return ItemMaterial.itemUltimateCatalyst;
 		}
 		
 		Item item = ForgeRegistries.ITEMS.getValue(ResourceHelper.getResource(parts[0], parts[1]));
 		if (item == null) {
-			return ModItems.itemMaterial.itemUltimateCatalyst;
+			return ItemMaterial.itemUltimateCatalyst;
 		}
 		
 		return new ItemStack(item, 1, Integer.parseInt(parts[2]));
@@ -171,11 +173,11 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 	
 	public boolean checkConfig(String name) {
 		String[] values = this.config.get("singularity", "default_singularities", new String[0]).getStringList();
-		
-		for (int i = 0; i < values.length; i++) {
-			String[] entry = values[i].split("=");
+
+		for (String value : values) {
+			String[] entry = value.split("=");
 			if (entry[0].equals(name)) {
-				return Boolean.valueOf(entry[1]);
+				return Boolean.parseBoolean(entry[1]);
 			}
 		}
 		
@@ -185,7 +187,7 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 	private void addToConfig(String name) {
 		Property prop = this.config.get("singularity", "default_singularities", new String[0]);
 		String[] values = prop.getStringList();
-		if (!Arrays.stream(values).anyMatch(s -> s.split("=")[0].equals(name))) {
+		if (Arrays.stream(values).noneMatch(s -> s.split("=")[0].equals(name))) {
 			String[] newValues = new String[values.length + 1];
 			for (int i = 0; i < newValues.length; i++) {
 				if (i < values.length) {

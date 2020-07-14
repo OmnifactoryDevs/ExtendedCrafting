@@ -1,9 +1,5 @@
 package com.blakebr0.extendedcrafting.tile;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
 import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
@@ -11,7 +7,7 @@ import com.blakebr0.extendedcrafting.block.BlockPedestal;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipe;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipeManager;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -31,6 +27,14 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TileCraftingCore extends TileEntity implements ITickable {
 
 	private final ItemStackHandler inventory = new StackHandler(1);
@@ -63,27 +67,23 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 
 		if (!this.getWorld().isRemote) {
 			CombinationRecipe recipe = this.getRecipe();
-			if (recipe != null) {
-				if (this.getEnergy().getEnergyStored() > 0) {
-					List<TilePedestal> pedestals = this.getPedestalsWithStuff(recipe, pedestalLocations);
-					boolean done = this.process(recipe);
-					if (done) {
-						for (TilePedestal pedestal : pedestals) {
-							IItemHandlerModifiable inventory = pedestal.getInventory();
-							inventory.setStackInSlot(0, StackHelper.decrease(inventory.getStackInSlot(0), 1, true));
-							pedestal.markDirty();
-							((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.SMOKE_NORMAL, false, pedestal.getPos().getX() + 0.5D, pedestal.getPos().getY() + 1.1D, pedestal.getPos().getZ() + 0.5D, 20, 0, 0, 0, 0.1D);
-						}
-						((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.END_ROD, false, this.getPos().getX() + 0.5D, this.getPos().getY() + 1.1D, this.getPos().getZ() + 0.5D, 50, 0, 0, 0, 0.1D);
-						this.getInventory().setStackInSlot(0, recipe.getOutput().copy());
-						this.progress = 0;
-						mark = true;
-					} else {
-						((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.SPELL, false, this.getPos().getX() + 0.5D, this.getPos().getY() + 1.1D, this.getPos().getZ() + 0.5D, 2, 0, 0, 0, 0.1D);
+			if (this.getEnergy().getEnergyStored() > 0) {
+				List<TilePedestal> pedestals = this.getPedestalsWithStuff(recipe, pedestalLocations);
+				boolean done = this.process(recipe);
+				if (done) {
+					for (TilePedestal pedestal : pedestals) {
+						IItemHandlerModifiable inventory = pedestal.getInventory();
+						inventory.setStackInSlot(0, StackHelper.decrease(inventory.getStackInSlot(0), 1, true));
+						pedestal.markDirty();
+						((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.SMOKE_NORMAL, false, pedestal.getPos().getX() + 0.5D, pedestal.getPos().getY() + 1.1D, pedestal.getPos().getZ() + 0.5D, 20, 0, 0, 0, 0.1D);
 					}
+					((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.END_ROD, false, this.getPos().getX() + 0.5D, this.getPos().getY() + 1.1D, this.getPos().getZ() + 0.5D, 50, 0, 0, 0, 0.1D);
+					this.getInventory().setStackInSlot(0, recipe.getOutput().copy());
+					this.progress = 0;
+					mark = true;
+				} else {
+					((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.SPELL, false, this.getPos().getX() + 0.5D, this.getPos().getY() + 1.1D, this.getPos().getZ() + 0.5D, 2, 0, 0, 0, 0.1D);
 				}
-			} else {
-				this.progress = 0;
 			}
 		}
 
@@ -119,16 +119,15 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 		ArrayList<Object> remaining = new ArrayList<>(recipe.getPedestalItems());
 		ArrayList<TilePedestal> pedestals = new ArrayList<>();
 
-		if (locations.isEmpty()) return null;
+		if (locations.isEmpty()) return Collections.emptyList();
 
 		for (BlockPos pos : locations) {
 			TileEntity tile = this.getWorld().getTileEntity(pos);
 			if (tile instanceof TilePedestal) {
 				TilePedestal pedestal = (TilePedestal) tile;
-				Iterator<Object> rem = remaining.iterator();
-				while (rem.hasNext()) {
+				for (Object o : remaining) {
 					boolean match = false;
-					Object next = rem.next();
+					Object next = o;
 					ItemStack stack = pedestal.getInventory().getStackInSlot(0);
 					if (next instanceof ItemStack) {
 						ItemStack nextStack = (ItemStack) next;
@@ -140,7 +139,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 							if (match) break;
 						}
 					}
-					
+
 					if (match) {
 						pedestals.add(pedestal);
 						remaining.remove(next);
@@ -181,9 +180,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 		if (!recipes.isEmpty()) {
 			for (CombinationRecipe recipe : recipes) {
 				List<TilePedestal> pedestals = this.getPedestalsWithStuff(recipe, locations);
-				if (pedestals != null) {
-					return recipe;
-				}
+				return recipe;
 			}
 		}
 		

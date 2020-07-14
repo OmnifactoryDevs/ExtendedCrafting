@@ -1,8 +1,5 @@
 package com.blakebr0.extendedcrafting.tile;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blakebr0.cucumber.helper.StackHelper;
 import com.blakebr0.cucumber.tile.TileEntityBase;
 import com.blakebr0.extendedcrafting.block.BlockEnderAlternator;
@@ -12,20 +9,28 @@ import com.blakebr0.extendedcrafting.crafting.endercrafter.IEnderCraftingRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableCrafting;
 import com.blakebr0.extendedcrafting.lib.EmptyContainer;
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.WorldServer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TileEnderCrafter extends TileEntityBase implements IInventory, ITickable, IExtendedTable {
 
 	private NonNullList<ItemStack> matrix = NonNullList.withSize(9, ItemStack.EMPTY);
@@ -38,13 +43,13 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 		if (!this.getWorld().isRemote) {
 			TableCrafting crafting = new TableCrafting(new EmptyContainer(), this);
 			IEnderCraftingRecipe recipe = EnderCrafterRecipeManager.getInstance().findMatchingRecipe(crafting, this.getWorld());
-			ItemStack result = recipe == null ? ItemStack.EMPTY : ((IRecipe) recipe).getCraftingResult(crafting);
+			ItemStack result = recipe == null ? ItemStack.EMPTY : recipe.getCraftingResult(crafting);
 			ItemStack output = this.getResult();
 			if (!result.isEmpty() && (output.isEmpty() || StackHelper.canCombineStacks(output, result))) {
 				List<BlockPos> alternators = this.getAlternatorPositions();
 				int alternatorCount = alternators.size();
 
-				if (alternatorCount > 0) {
+				if (alternatorCount > 0 && recipe != null) {
 					this.progress(alternatorCount, recipe.getEnderCrafterTimeSeconds());
 					
 					for (BlockPos pos : alternators) {
@@ -135,8 +140,8 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 	}
 	
 	public List<BlockPos> getAlternatorPositions() {
-		ArrayList<BlockPos> alternators = new ArrayList<BlockPos>();
-		Iterable<BlockPos> blocks = this.getPos().getAllInBox(this.getPos().add(-3, -3, -3), this.getPos().add(3, 3, 3));
+		ArrayList<BlockPos> alternators = new ArrayList<>();
+		Iterable<BlockPos> blocks = BlockPos.getAllInBox(this.getPos().add(-3, -3, -3), this.getPos().add(3, 3, 3));
 		for (BlockPos aoePos : blocks) {
 			Block block = this.getWorld().getBlockState(aoePos).getBlock();
 			if (block instanceof BlockEnderAlternator) {
@@ -164,7 +169,7 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 
 	@Override
 	public String getName() {
-		return null;
+		return getDisplayName().getFormattedText();
 	}
 
 	@Override
@@ -241,5 +246,11 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 	public void clear() {
 		this.matrix = NonNullList.withSize(9, ItemStack.EMPTY);
 		this.setResult(ItemStack.EMPTY);
+	}
+
+	@Nonnull
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TextComponentTranslation("tile.ec.ender_crafter.name");
 	}
 }

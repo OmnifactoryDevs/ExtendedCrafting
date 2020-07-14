@@ -1,10 +1,9 @@
 package com.blakebr0.extendedcrafting.crafting;
 
-import java.util.ArrayList;
-
 import com.blakebr0.extendedcrafting.config.ModConfig;
-
 import net.minecraft.item.ItemStack;
+
+import java.util.ArrayList;
 
 public class CombinationRecipeManager {
 
@@ -12,7 +11,7 @@ public class CombinationRecipeManager {
 
 	private ArrayList<CombinationRecipe> recipes = new ArrayList<CombinationRecipe>();
 
-	public static final CombinationRecipeManager getInstance() {
+	public static CombinationRecipeManager getInstance() {
 		return INSTANCE;
 	}
 	

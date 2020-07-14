@@ -1,16 +1,12 @@
 package com.blakebr0.extendedcrafting.tile;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
 import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipe;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
@@ -27,6 +23,13 @@ import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TileCompressor extends TileEntity implements ISidedInventory, ITickable {
 
 	private NonNullList<ItemStack> inventoryStacks = NonNullList.withSize(3, ItemStack.EMPTY);
@@ -55,9 +58,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 						valid.add(recipe);
 					}
 				} else if (input instanceof List) {
-					Iterator<ItemStack> itr = ((List<ItemStack>) input).iterator();
-					while (itr.hasNext()) {
-						ItemStack next = itr.next();
+					for (ItemStack next : (List<ItemStack>) input) {
 						if (next.getMetadata() == 32767 || next.getMetadata() == stack.getMetadata()) {
 							if (next.getItem() == stack.getItem()) {
 								valid.add(recipe);

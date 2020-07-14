@@ -1,9 +1,5 @@
 package com.blakebr0.extendedcrafting.tile;
 
-import java.util.Locale;
-
-import javax.annotation.Nonnull;
-
 import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
 import com.blakebr0.cucumber.util.Utils;
@@ -15,7 +11,6 @@ import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.blakebr0.extendedcrafting.lib.EmptyContainer;
 import com.blakebr0.extendedcrafting.lib.FakeRecipeHandler;
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -37,6 +32,10 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
+import javax.annotation.Nonnull;
+import java.util.Locale;
+
+// FIXME please
 public class TileAutomationInterface extends TileEntity implements ITickable, ISidedInventory {
 	
 	private final ItemStackHandler inventory = new StackHandler(2);

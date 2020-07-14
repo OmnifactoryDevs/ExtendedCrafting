@@ -2,6 +2,7 @@ package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -13,6 +14,11 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TilePedestal extends TileEntity {
 
 	private ItemStackHandler inventory = new StackHandler(1);
@@ -52,12 +58,12 @@ public class TilePedestal extends TileEntity {
 	}
 
 	@Override
-	public boolean hasCapability(Capability<?> capability, EnumFacing side) {
+	public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing side) {
 		return capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY || super.hasCapability(capability, side);
 	}
 
 	@Override
-	public <T> T getCapability(Capability<T> capability, EnumFacing side) {
+	public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing side) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(inventory);
 		}

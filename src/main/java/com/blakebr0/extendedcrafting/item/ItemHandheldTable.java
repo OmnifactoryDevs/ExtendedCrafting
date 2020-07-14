@@ -13,6 +13,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
+
 public class ItemHandheldTable extends ItemBase implements IEnableable {
 
 	public ItemHandheldTable() {
@@ -27,7 +29,8 @@ public class ItemHandheldTable extends ItemBase implements IEnableable {
 	}
 	
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+	@Nonnull
+	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
 		BlockPos pos = player.getPosition();
 		if (!world.isRemote) {
 			player.openGui(ExtendedCrafting.instance, GuiHandler.HANDHELD_TABLE, world, pos.getX(), pos.getY(), pos.getZ());

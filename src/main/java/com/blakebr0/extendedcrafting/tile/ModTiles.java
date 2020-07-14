@@ -7,7 +7,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class ModTiles {
 
-	// TODO: 1.13, correct the namespaces
+	// 1.13, correct the namespaces
+	@SuppressWarnings("deprecation") // out of scope
 	public static void init() {
 		if (ModConfig.confCraftingCoreEnabled) {
 			GameRegistry.registerTileEntity(TilePedestal.class, "EC_Pedestal");

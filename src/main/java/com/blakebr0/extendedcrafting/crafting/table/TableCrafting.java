@@ -2,6 +2,7 @@ package com.blakebr0.extendedcrafting.crafting.table;
 
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -9,6 +10,10 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TableCrafting extends InventoryCrafting implements ISidedInventory {
 
 	public IExtendedTable tile;
@@ -47,17 +52,15 @@ public class TableCrafting extends InventoryCrafting implements ISidedInventory 
             if (stack.getCount() <= count) {
                 itemstack = stack.copy();
                 this.handler.setInventorySlotContents(index, ItemStack.EMPTY);
-                this.container.onCraftMatrixChanged(this);
-                return itemstack;
             } else {
                 itemstack = stack.splitStack(count);
                 if (stack.getCount() == 0) {
                     this.handler.setInventorySlotContents(index, ItemStack.EMPTY);
                 }
-                
-                this.container.onCraftMatrixChanged(this);
-                return itemstack;
+
             }
+	        this.container.onCraftMatrixChanged(this);
+	        return itemstack;
         } else {
             return ItemStack.EMPTY;
         }

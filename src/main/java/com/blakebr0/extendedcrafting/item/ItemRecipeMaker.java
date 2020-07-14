@@ -1,12 +1,5 @@
 package com.blakebr0.extendedcrafting.item;
 
-import java.awt.Desktop;
-import java.awt.Toolkit;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blakebr0.cucumber.helper.NBTHelper;
 import com.blakebr0.cucumber.iface.IEnableable;
 import com.blakebr0.cucumber.item.ItemBase;
@@ -17,7 +10,7 @@ import com.blakebr0.extendedcrafting.compat.jei.CompatJEI;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
 import com.blakebr0.extendedcrafting.tile.TileEnderCrafter;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -25,17 +18,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.oredict.OreDictionary;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ItemRecipeMaker extends ItemBase implements IEnableable {
 	
 	private static final String NEW_LINE = System.lineSeparator() + "\t";
@@ -73,7 +73,7 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 
 		TileEntity tile = world.getTileEntity(pos);
 
-		if (tile != null && tile instanceof IExtendedTable) {
+		if (tile instanceof IExtendedTable) {
 			if (world.isRemote) {
 				setClipboard(tile, stack);
 				player.sendMessage(new TextComponentTranslation("message.ec.copied_recipe"));
@@ -105,7 +105,7 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		tooltip.add(Utils.localize("tooltip.ec.mode", getModeString(stack)));
 	}
 
@@ -128,12 +128,12 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 	}
 	
 	private String makeItemArrayShaped(IExtendedTable table) {
-		String string = "";
+		StringBuilder string = new StringBuilder();
 		NonNullList<ItemStack> matrix = table.getMatrix();
 		for (int i = 0; i < matrix.size(); i++) {
 			int sr = (int) Math.sqrt(matrix.size());
 			if (i == 0 || i % sr == 0) {
-				string += "[";
+				string.append("[");
 			}
 
 			ItemStack stack = matrix.get(i);
@@ -147,7 +147,7 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 			}
 			
 			if (item.isEmpty()) {
-				String reg = stack.getItem().getRegistryName().toString();
+				String reg = Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
 				item = stack.isEmpty() ? "null" : reg;
 				if (!stack.isEmpty() && stack.getMetadata() > 0) {
 					item += ":" + stack.getMetadata();
@@ -155,37 +155,37 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 			}
 			
 			if (!item.equalsIgnoreCase("null")) {
-				string += "<" + item + ">";
+				string.append("<").append(item).append(">");
 				
 				if (ModConfig.confRMNBT && !stack.isEmpty() && stack.hasTagCompound() && Loader.isModLoaded("crafttweaker")) {
 					NBTBase nbt = stack.serializeNBT().getTag("tag");
 					String tag = CraftTweakerUtils.writeTag(nbt);
-					string += ".withTag(" + tag + ")";
+					string.append(".withTag(").append(tag).append(")");
 				}
 			} else {
-				string += item;
+				string.append(item);
 			}
 			
 			if ((i + 1) % sr != 0) {
-				string += ", ";
+				string.append(", ");
 			}
 			
 			if (i + 1 == sr || (i + 1) % sr == 0) {
-				string += "]";
+				string.append("]");
 				if (i + 1 < matrix.size()) {
-					string += ", ";
-					string += NEW_LINE;
+					string.append(", ");
+					string.append(NEW_LINE);
 				} else {
-					string += System.lineSeparator();
+					string.append(System.lineSeparator());
 				}
 			}
 		}
 		
-		return string;
+		return string.toString();
 	}
 	
 	private String makeItemArrayShapeless(IExtendedTable table) {
-		String string = "";
+		StringBuilder string = new StringBuilder();
 		NonNullList<ItemStack> matrix = table.getMatrix();
 		ArrayList<Integer> slots = new ArrayList<>();
 		int lastSlot = 0;
@@ -200,42 +200,41 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 		for (int i : slots) {
 			ItemStack stack = matrix.get(i);
 			int[] oreIds = OreDictionary.getOreIDs(stack);
-			String item = "";
+			String item;
 			if (ModConfig.confRMOredict && oreIds.length > 0) {
 				item = "ore:" + OreDictionary.getOreName(oreIds[0]);
 			} else {
-				String reg = stack.getItem().getRegistryName().toString();
+				String reg = Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
 				item = stack.isEmpty() ? "null" : reg;
 				if (!stack.isEmpty() && stack.getMetadata() > 0) {
 					item += ":" + stack.getMetadata();
 				}
 			}
 					
-			string += "<" + item + ">";
+			string.append("<").append(item).append(">");
 			
 			if (ModConfig.confRMNBT && !stack.isEmpty() && stack.hasTagCompound() && Loader.isModLoaded("crafttweaker")) {
 				NBTBase nbt = stack.serializeNBT().getTag("tag");
 				String tag = CraftTweakerUtils.writeTag(nbt);
-				string += ".withTag(" + tag + ")";
+				string.append(".withTag(").append(tag).append(")");
 			}
 			
 			if (i != lastSlot) {
-				string += ", ";
+				string.append(", ");
 			}
 		}
 		
-		return string;
+		return string.toString();
 	}
 	
 	private String getModeString(ItemStack stack) {
 		NBTTagCompound tag = stack.getTagCompound();
-		boolean shapeless = tag != null && tag.hasKey("Shapeless") ? tag.getBoolean("Shapeless") : false;
+		boolean shapeless = (tag != null && tag.hasKey("Shapeless")) && tag.getBoolean("Shapeless");
 		return shapeless ? "Shapeless" : "Shaped";
 	}
 	
 	private boolean isShapeless(ItemStack stack) {
 		NBTTagCompound tag = stack.getTagCompound();
-		boolean shapeless = tag != null && tag.hasKey("Shapeless") ? tag.getBoolean("Shapeless") : false;
-		return shapeless;
+		return (tag != null && tag.hasKey("Shapeless")) && tag.getBoolean("Shapeless");
 	}
 }

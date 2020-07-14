@@ -1,8 +1,5 @@
 package com.blakebr0.extendedcrafting.item;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.blakebr0.cucumber.iface.IEnableable;
 import com.blakebr0.cucumber.item.ItemBase;
 import com.blakebr0.cucumber.lib.Colors;
@@ -10,15 +7,25 @@ import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.crafting.CraftingHelper;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 
 	public static ArrayList<ItemStack> singularities = new ArrayList<>();
@@ -57,7 +64,7 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 			}
 
 			try {
-				meta = Integer.valueOf(parts[1]);
+				meta = Integer.parseInt(parts[1]);
 			} catch (NumberFormatException e) {
 				ExtendedCrafting.LOGGER.error("Invalid ultimate singularity blacklist meta: " + value);
 				continue;
@@ -65,7 +72,7 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 
 			if (type.equals("default")) {
 				blacklistDefaults.add(meta);
-			} else if (type.equals("custom")) {
+			} else {
 				blacklistCustoms.add(meta);
 			}
 		}
@@ -99,7 +106,11 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 		if (!ModConfig.confUltimateSingularityRecipe || !this.isEnabled())
 			return;
 		
-		TableRecipeManager.getInstance().addShapeless(4, new ItemStack(ModItems.itemSingularityUltimate, 1, 0), singularities.toArray());
+		TableRecipeManager.getInstance()
+				.addShapeless(4, new ItemStack(ModItems.itemSingularityUltimate, 1, 0),
+						singularities.stream()
+								.map(CraftingHelper::getIngredient)
+								.collect(Collectors.toCollection(NonNullList::create)));
 	}
 
 	@Override
@@ -113,18 +124,7 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 	}
 
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		tooltip.add(Colors.ITALICS + Utils.localize("tooltip.ec.singularity_ultimate"));
-	}
-
-	public class BlacklistEntry {
-
-		public String type;
-		public int meta;
-
-		public BlacklistEntry(String type, int meta) {
-			this.type = type;
-			this.meta = meta;
-		}
 	}
 }

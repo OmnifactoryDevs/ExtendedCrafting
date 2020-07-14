@@ -7,6 +7,11 @@ buildscript {
         classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
+
+plugins {
+    id "com.wynprice.cursemaven" version "2.1.5"
+}
+
 apply plugin: 'net.minecraftforge.gradle.forge'
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
@@ -32,11 +37,17 @@ repositories {
 	maven {
 		url = "http://dvs1.progwml6.com/files/maven"
 	}
+    maven {
+        url = "https://maven.blamejared.com/"
+    }
 }
 
 dependencies {
 	deobfCompile "mezz.jei:jei_1.12.2:4.15.0.268:api"
 	runtime "mezz.jei:jei_1.12.2:4.15.0.268"
+    deobfCompile "CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-4.1.20.581"
+    deobfCompile "curse.maven:cucumber:2645867"
+    deobfCompile "curse.maven:hwyla:2568751"
 }
 
 processResources {
@@ -56,13 +67,4 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-}
-
-artifacts {
-    archives deobfJar
 }
