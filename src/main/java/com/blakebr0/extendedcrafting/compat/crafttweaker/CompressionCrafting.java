@@ -8,7 +8,6 @@ import crafttweaker.api.item.IIngredient;
 import crafttweaker.api.item.IItemStack;
 import crafttweaker.api.minecraft.CraftTweakerMC;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import stanhebben.zenscript.annotations.ZenClass;
 import stanhebben.zenscript.annotations.ZenMethod;
 
@@ -31,7 +30,7 @@ public class CompressionCrafting {
 	}
 
 	private static class Add implements IAction {
-		CompressorRecipe recipe;
+		final CompressorRecipe recipe;
 
 		public Add(CompressorRecipe add) {
 			this.recipe = add;
@@ -49,7 +48,7 @@ public class CompressionCrafting {
 	}
 
 	private static class Remove implements IAction {
-		ItemStack remove;
+		final ItemStack remove;
 
 		public Remove(ItemStack remove) {
 			this.remove = remove;

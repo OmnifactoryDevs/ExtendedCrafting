@@ -4,6 +4,7 @@ import com.blakebr0.cucumber.block.BlockBase;
 import com.blakebr0.cucumber.iface.IModelHelper;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
@@ -23,9 +24,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@SuppressWarnings("deprecation")
 public class BlockLamp extends BlockBase implements IModelHelper {
 	
 	public static final PropertyEnum<Type> VARIANT = PropertyEnum.create("variant", Type.class);
@@ -63,7 +69,7 @@ public class BlockLamp extends BlockBase implements IModelHelper {
 	@Override
 	public void initModels() {
 		for (Type type : Type.values()) {
-			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), type.getMetadata(), new ModelResourceLocation(Objects.requireNonNull(getRegistryName()).toString() + "_" + type.byMetadata(type.getMetadata()).getName()));
+			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(this), type.getMetadata(), new ModelResourceLocation(Objects.requireNonNull(getRegistryName()).toString() + "_" + Type.byMetadata(type.getMetadata()).getName()));
 		}
 	}
 
@@ -83,14 +89,14 @@ public class BlockLamp extends BlockBase implements IModelHelper {
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced) {
 		int meta = stack.getMetadata();
 		if (meta < 2) {
 			tooltip.add(Utils.localize("tooltip.ec.lamp_" + Type.byMetadata(meta).getName()));
 		}
 	}
 
-	public static enum Type implements IStringSerializable {
+	public enum Type implements IStringSerializable {
 
 		GLOWSTONE(0, "glowstone"),
 		LUMINESSENCE(1, "luminessence");

@@ -17,8 +17,8 @@ import java.util.function.Function;
 @SuppressWarnings("unused")
 public class TableRecipeShaped extends TableRecipeBase {
 
-	protected int width;
-	protected int height;
+	protected final int width;
+	protected final int height;
 
 	public TableRecipeShaped(int tier, ItemStack result, int width, int height, NonNullList<Ingredient> ingredients) {
 		super(tier, result, ingredients);

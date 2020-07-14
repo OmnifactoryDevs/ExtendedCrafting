@@ -34,7 +34,7 @@ public class ExtendedCrafting {
 	public static CommonProxy proxy;
 
 	@Instance(ExtendedCrafting.MOD_ID)
-	public static ExtendedCrafting instance = new ExtendedCrafting();
+	public static final ExtendedCrafting instance = new ExtendedCrafting();
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {

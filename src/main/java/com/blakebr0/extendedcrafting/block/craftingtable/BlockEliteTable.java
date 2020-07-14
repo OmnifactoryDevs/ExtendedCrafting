@@ -1,7 +1,5 @@
 package com.blakebr0.extendedcrafting.block.craftingtable;
 
-import java.util.List;
-
 import com.blakebr0.cucumber.block.BlockBase;
 import com.blakebr0.cucumber.iface.IEnableable;
 import com.blakebr0.cucumber.util.Utils;
@@ -9,7 +7,7 @@ import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.client.gui.GuiHandler;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.tile.TileEliteCraftingTable;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -26,6 +24,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+
+@SuppressWarnings("deprecation")
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class BlockEliteTable extends BlockBase implements ITileEntityProvider, IEnableable {
 
 	public BlockEliteTable() {
@@ -40,17 +45,15 @@ public class BlockEliteTable extends BlockBase implements ITileEntityProvider, I
 
 	@Override
 	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-		if (world.isRemote) {
-			return true;
-		} else {
+		if (!world.isRemote) {
 			TileEntity tile = world.getTileEntity(pos);
 
 			if (tile instanceof TileEliteCraftingTable) {
 				player.openGui(ExtendedCrafting.instance, GuiHandler.ELITE_TABLE, world, pos.getX(), pos.getY(), pos.getZ());
 			}
-			
-			return true;
+
 		}
+		return true;
 	}
 
 	@Override
@@ -58,9 +61,8 @@ public class BlockEliteTable extends BlockBase implements ITileEntityProvider, I
 		TileEliteCraftingTable tile = (TileEliteCraftingTable) world.getTileEntity(pos);
 		if (tile != null) {
 			NonNullList<ItemStack> matrix = tile.getMatrix();
-			for (int i = 0; i < matrix.size(); i++) {
-				ItemStack stack = matrix.get(i);
-				this.spawnAsEntity(world, pos, stack);
+			for (ItemStack stack : matrix) {
+				spawnAsEntity(world, pos, stack);
 			}
 		}
 		
@@ -78,7 +80,7 @@ public class BlockEliteTable extends BlockBase implements ITileEntityProvider, I
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		tooltip.add(Utils.localize("tooltip.ec.tier", 3));
 	}
 

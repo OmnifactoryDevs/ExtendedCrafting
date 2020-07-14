@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class TableRecipeManager {
 
 	private static final TableRecipeManager INSTANCE = new TableRecipeManager();
-	private List<ITieredRecipe> recipes = new ArrayList<>();
+	private final List<ITieredRecipe> recipes = new ArrayList<>();
 
 	public static TableRecipeManager getInstance() {
 		return INSTANCE;

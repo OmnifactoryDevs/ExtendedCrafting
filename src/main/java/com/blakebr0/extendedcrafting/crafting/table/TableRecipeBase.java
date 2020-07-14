@@ -24,11 +24,11 @@ public abstract class TableRecipeBase implements ITieredRecipe, IEnderCraftingRe
 	public static final int MAX_CRAFT_GRID_WIDTH = 9;
 	public static final int MAX_CRAFT_GRID_HEIGHT = 9;
 
-	protected ItemStack output;
-	protected NonNullList<Ingredient> input;
+	protected final ItemStack output;
+	protected final NonNullList<Ingredient> input;
 	protected boolean mirrored = true;
-	protected ResourceLocation group;
-	protected int tier;
+	protected final ResourceLocation group;
+	protected final int tier;
 	protected Map<Integer, Function<ItemStack, ItemStack>> transformers;
 	public int enderCrafterRecipeTimeRequired = ModConfig.confEnderTimeRequired;
 

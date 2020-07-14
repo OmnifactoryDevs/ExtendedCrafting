@@ -10,21 +10,21 @@ import com.blakebr0.extendedcrafting.lib.ViewRecipeInfo;
 import com.blakebr0.extendedcrafting.network.InterfaceRecipeChangePacket;
 import com.blakebr0.extendedcrafting.network.NetworkThingy;
 import com.blakebr0.extendedcrafting.tile.TileAutomationInterface;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-import java.io.IOException;
+import javax.annotation.ParametersAreNonnullByDefault;
 
+@ParametersAreNonnullByDefault
+@SuppressWarnings("SameParameterValue")
 public class GuiAutomationInterface extends GuiContainer {
 
 	protected static final ResourceLocation GUI = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/gui/automation_interface.png");
-	protected TileAutomationInterface tile;
-	protected InventoryPlayer player;
+	protected final TileAutomationInterface tile;
+	protected final InventoryPlayer player;
 	private GuiButton save, clear, view, config;
 	
 	public GuiAutomationInterface(ContainerAutomationInterface container) {
@@ -65,7 +65,7 @@ public class GuiAutomationInterface extends GuiContainer {
 	}
 	
 	@Override
-	protected void actionPerformed(GuiButton button) throws IOException {
+	protected void actionPerformed(GuiButton button) {
 		if (button == this.save) {
 			NetworkThingy.THINGY.sendToServer(new InterfaceRecipeChangePacket(this.tile.getPos().toLong(), 0));
 			this.save.enabled = false;
@@ -120,22 +120,8 @@ public class GuiAutomationInterface extends GuiContainer {
 		int i1 = this.getEnergyBarScaled(78);
 		this.drawTexturedModalRect(x + 7, y + 94 - i1, 178, 78 - i1, 15, i1 + 1);
 	}
-    
-    private void drawItemStack(ItemStack stack, int x, int y) {
-    	GlStateManager.pushMatrix();
-        GlStateManager.translate(0.0F, 0.0F, 32.0F);
-        this.zLevel = 200.0F;
-        this.itemRender.zLevel = 200.0F;
-        FontRenderer font = stack.getItem().getFontRenderer(stack);
-        if (font == null) font = this.fontRenderer;
-        this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, null);
-        this.zLevel = 0.0F;
-        this.itemRender.zLevel = 0.0F;
-        GlStateManager.popMatrix();
-    }
-    
-    public void updateButtons() {
+
+	public void updateButtons() {
     	this.save.enabled = !this.tile.hasRecipe() && this.tile.hasTable();
     	this.clear.enabled = this.tile.hasRecipe();
     	this.view.enabled = this.tile.hasRecipe();

@@ -6,6 +6,7 @@ import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.blakebr0.extendedcrafting.crafting.table.TableResultHandler;
 import com.blakebr0.extendedcrafting.tile.TileBasicCraftingTable;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -14,11 +15,15 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ContainerBasicTable extends Container {
 
-	public InventoryCrafting matrix;
-	public IInventory result;
-	public TileBasicCraftingTable tile;
+	public final InventoryCrafting matrix;
+	public final IInventory result;
+	public final TileBasicCraftingTable tile;
 
 	public ContainerBasicTable(InventoryPlayer player, TileBasicCraftingTable tile) {
 		this.tile = tile;

@@ -1,21 +1,24 @@
 package com.blakebr0.extendedcrafting.compat.jei.tablecrafting;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.compat.jei.CompatJEI;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShaped;
-
 import mezz.jei.api.IJeiHelpers;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IStackHelper;
 import mezz.jei.api.recipe.wrapper.IShapedCraftingRecipeWrapper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Collections;
+import java.util.List;
+
+@ParametersAreNonnullByDefault
 public class TableShapedWrapper implements IShapedCraftingRecipeWrapper {
 
 	private final TableRecipeShaped recipe;
@@ -46,8 +49,8 @@ public class TableShapedWrapper implements IShapedCraftingRecipeWrapper {
 
 		List<List<ItemStack>> inputs = helper.expandRecipeItemStackInputs(this.recipe.getIngredients());
 
-		ingredients.setInputLists(ItemStack.class, inputs);
-		ingredients.setOutput(ItemStack.class, output);
+		ingredients.setInputLists(VanillaTypes.ITEM, inputs);
+		ingredients.setOutput(VanillaTypes.ITEM, output);
 	}
 	
 	@Override
@@ -62,8 +65,9 @@ public class TableShapedWrapper implements IShapedCraftingRecipeWrapper {
 		}
 	}
 	
+	@Nonnull
 	@Override
-	public List getTooltipStrings(int mouseX, int mouseY) {
+	public List<String> getTooltipStrings(int mouseX, int mouseY) {
 		int sX = this.iconsX / 2, sY = this.iconsY / 2;
 		
 		if (this.tiered && this.recipe.requiresTier() && mouseX > sX - 1 && mouseX < sX + 10 && mouseY > sY - 1 && mouseY < sY + 8) {

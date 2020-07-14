@@ -6,7 +6,7 @@ import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.client.gui.GuiHandler;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.tile.TileAutomationInterface;
-
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -20,6 +20,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@SuppressWarnings("deprecation")
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class BlockAutomationInterface extends BlockBase implements ITileEntityProvider, IEnableable {
 
 	public BlockAutomationInterface() {
@@ -52,7 +57,7 @@ public class BlockAutomationInterface extends BlockBase implements ITileEntityPr
 		if (tile != null) {
 			for (int i = 0; i < tile.getSizeInventory(); i++) {
 				ItemStack stack = tile.getStackInSlot(i);
-				this.spawnAsEntity(world, pos, stack);
+				spawnAsEntity(world, pos, stack);
 			}
 		}
 		

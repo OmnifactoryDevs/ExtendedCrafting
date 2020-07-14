@@ -1,10 +1,7 @@
 package com.blakebr0.extendedcrafting.block;
 
-import javax.annotation.Nonnull;
-
 import com.blakebr0.cucumber.block.BlockBase;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
-
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -12,6 +9,11 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@SuppressWarnings("deprecation")
+@ParametersAreNonnullByDefault
 public class BlockFrame extends BlockBase {
 
 	public BlockFrame() {

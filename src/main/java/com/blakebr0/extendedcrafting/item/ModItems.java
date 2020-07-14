@@ -7,17 +7,17 @@ import com.blakebr0.extendedcrafting.lib.ModGuide;
 
 public class ModItems {
 	
-	public static ItemGuide itemGuide = new ItemGuide("extendedcrafting", ExtendedCrafting.CREATIVE_TAB, ModGuide.GUIDE);
+	public static final ItemGuide itemGuide = new ItemGuide("extendedcrafting", ExtendedCrafting.CREATIVE_TAB, ModGuide.GUIDE);
 
-	public static ItemMaterial itemMaterial = new ItemMaterial();
+	public static final ItemMaterial itemMaterial = new ItemMaterial();
 
-	public static ItemHandheldTable itemHandheldTable = new ItemHandheldTable();
+	public static final ItemHandheldTable itemHandheldTable = new ItemHandheldTable();
 	
-	public static ItemRecipeMaker itemRecipeMaker = new ItemRecipeMaker();
+	public static final ItemRecipeMaker itemRecipeMaker = new ItemRecipeMaker();
 
-	public static ItemSingularity itemSingularity = new ItemSingularity();
-	public static ItemSingularityCustom itemSingularityCustom = new ItemSingularityCustom();
-	public static ItemSingularityUltimate itemSingularityUltimate = new ItemSingularityUltimate();
+	public static final ItemSingularity itemSingularity = new ItemSingularity();
+	public static final ItemSingularityCustom itemSingularityCustom = new ItemSingularityCustom();
+	public static final ItemSingularityUltimate itemSingularityUltimate = new ItemSingularityUltimate();
 
 	public static void init() {
 		final ModRegistry registry = ExtendedCrafting.REGISTRY;

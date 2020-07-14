@@ -6,13 +6,13 @@ import net.minecraft.item.crafting.Ingredient;
 
 public class CompressorRecipe {
 
-	protected ItemStack output;
-	protected Ingredient input;
-	protected int inputCount;
-	protected Ingredient catalyst;
-	protected boolean consumeCatalyst;
-	protected int powerCost;
-	protected int powerRate;
+	protected final ItemStack output;
+	protected final Ingredient input;
+	protected final int inputCount;
+	protected final Ingredient catalyst;
+	protected final boolean consumeCatalyst;
+	protected final int powerCost;
+	protected final int powerRate;
 	
 	public CompressorRecipe(ItemStack output, Ingredient input, int inputCount, Ingredient catalyst, boolean consumeCatalyst, int powerCost) {
 		this(output, input, inputCount, catalyst, consumeCatalyst, powerCost, ModConfig.confCompressorRFRate);

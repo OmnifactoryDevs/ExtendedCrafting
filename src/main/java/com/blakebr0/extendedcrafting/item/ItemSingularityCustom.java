@@ -31,9 +31,9 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEnableable {
 
-	public static ArrayList<CustomSingularity> singularities = new ArrayList<>();
-	public static Map<Integer, Integer> singularityColors = new HashMap<>();
-	public static Map<Integer, Object> singularityMaterials = new HashMap<>();
+	public static final ArrayList<CustomSingularity> singularities = new ArrayList<>();
+	public static final Map<Integer, Integer> singularityColors = new HashMap<>();
+	public static final Map<Integer, Object> singularityMaterials = new HashMap<>();
 
 	public ItemSingularityCustom() {
 		super("ec.singularity_custom", ExtendedCrafting.REGISTRY);
@@ -171,10 +171,10 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 
 	public static class CustomSingularity {
 
-		public int meta;
-		public String name;
-		public String material;
-		public int color;
+		public final int meta;
+		public final String name;
+		public final String material;
+		public final int color;
 		
 		public CustomSingularity(int meta, String name, String material, int color) {
 			this.meta = meta;

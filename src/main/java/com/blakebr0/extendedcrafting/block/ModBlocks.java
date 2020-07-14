@@ -13,27 +13,27 @@ import net.minecraft.block.material.Material;
 
 public class ModBlocks {
 
-	public static BlockStorage blockStorage = new BlockStorage();
-	public static BlockFrame blockFrame = new BlockFrame();
-	public static BlockLamp blockLamp = new BlockLamp();
-	public static BlockTrimmed blockTrimmed = new BlockTrimmed();
+	public static final BlockStorage blockStorage = new BlockStorage();
+	public static final BlockFrame blockFrame = new BlockFrame();
+	public static final BlockLamp blockLamp = new BlockLamp();
+	public static final BlockTrimmed blockTrimmed = new BlockTrimmed();
 
-	public static BlockPedestal blockPedestal = new BlockPedestal();
-	public static BlockCraftingCore blockCraftingCore = new BlockCraftingCore();
+	public static final BlockPedestal blockPedestal = new BlockPedestal();
+	public static final BlockCraftingCore blockCraftingCore = new BlockCraftingCore();
 	
-	public static BlockBasic blockCraftingTable = new BlockBasic("ec.crafting_table", Material.WOOD, SoundType.WOOD, 2.5F, 10.0F);
+	public static final BlockBasic blockCraftingTable = new BlockBasic("ec.crafting_table", Material.WOOD, SoundType.WOOD, 2.5F, 10.0F);
 	
-	public static BlockAutomationInterface blockAutomationInterface = new BlockAutomationInterface();
+	public static final BlockAutomationInterface blockAutomationInterface = new BlockAutomationInterface();
 
-	public static BlockBasicTable blockBasicTable = new BlockBasicTable();
-	public static BlockAdvancedTable blockAdvancedTable = new BlockAdvancedTable();
-	public static BlockEliteTable blockEliteTable = new BlockEliteTable();
-	public static BlockUltimateTable blockUltimateTable = new BlockUltimateTable();
+	public static final BlockBasicTable blockBasicTable = new BlockBasicTable();
+	public static final BlockAdvancedTable blockAdvancedTable = new BlockAdvancedTable();
+	public static final BlockEliteTable blockEliteTable = new BlockEliteTable();
+	public static final BlockUltimateTable blockUltimateTable = new BlockUltimateTable();
 
-	public static BlockCompressor blockCompressor = new BlockCompressor();
+	public static final BlockCompressor blockCompressor = new BlockCompressor();
 	
-	public static BlockEnderAlternator blockEnderAlternator = new BlockEnderAlternator();
-	public static BlockEnderCrafter blockEnderCrafter = new BlockEnderCrafter();
+	public static final BlockEnderAlternator blockEnderAlternator = new BlockEnderAlternator();
+	public static final BlockEnderCrafter blockEnderCrafter = new BlockEnderCrafter();
 
 	public static void init() {
 		final ModRegistry registry = ExtendedCrafting.REGISTRY;

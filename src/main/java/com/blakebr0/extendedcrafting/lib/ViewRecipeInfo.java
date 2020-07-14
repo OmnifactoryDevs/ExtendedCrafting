@@ -7,14 +7,14 @@ public class ViewRecipeInfo {
 	public static final ViewRecipeInfo ELITE = new ViewRecipeInfo(200, 242, 12, 49, -5, -4, 172, 71);
 	public static final ViewRecipeInfo ULTIMATE = new ViewRecipeInfo(234, 278, 31, 85, -5, -4, 206, 89);
 	
-	public int width;
-	public int height;
-	public int invOffsetX;
-	public int invOffsetY;
-	public int gridStartX;
-	public int gridStartY;
-	public int outputX;
-	public int outputY;
+	public final int width;
+	public final int height;
+	public final int invOffsetX;
+	public final int invOffsetY;
+	public final int gridStartX;
+	public final int gridStartY;
+	public final int outputX;
+	public final int outputY;
 	
 	public ViewRecipeInfo(int width, int height, int invOffsetX, int invOffsetY, int gridStartX, int gridStartY, int outputX, int outputY) {
 		this.width = width;

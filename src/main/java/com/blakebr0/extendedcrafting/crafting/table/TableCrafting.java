@@ -16,10 +16,10 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class TableCrafting extends InventoryCrafting implements ISidedInventory {
 
-	public IExtendedTable tile;
-	public IInventory handler;
-	public Container container;
-	public int lineSize;
+	public final IExtendedTable tile;
+	public final IInventory handler;
+	public final Container container;
+	public final int lineSize;
 
 	public TableCrafting(Container container, IExtendedTable tile) {
 		super(container, tile.getLineSize(), tile.getLineSize());

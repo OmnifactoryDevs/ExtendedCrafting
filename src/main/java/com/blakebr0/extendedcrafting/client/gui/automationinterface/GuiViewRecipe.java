@@ -1,7 +1,5 @@
 package com.blakebr0.extendedcrafting.client.gui.automationinterface;
 
-import java.io.IOException;
-
 import com.blakebr0.cucumber.gui.button.GuiButtonArrow;
 import com.blakebr0.cucumber.helper.RenderHelper;
 import com.blakebr0.cucumber.util.Utils;
@@ -21,11 +19,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.ItemStackHandler;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public class GuiViewRecipe extends GuiContainer {
 	
-	private GuiAutomationInterface parent;
-	public ViewRecipeInfo info;
-	public ResourceLocation grid;
+	private final GuiAutomationInterface parent;
+	public final ViewRecipeInfo info;
+	public final ResourceLocation grid;
 	public GuiButton back;
 		
 	public GuiViewRecipe(GuiAutomationInterface parent, ViewRecipeInfo info, int width) {
@@ -67,7 +68,7 @@ public class GuiViewRecipe extends GuiContainer {
 					
 					int x1 = x + 13 + (j * 18) + this.info.gridStartX;
 					int y1 = y + 22 + (i * 18) + this.info.gridStartY;
-					this.drawItemStack(stack, x1, y1, "");
+					this.drawItemStack(stack, x1, y1);
 					
 					int xOffset = x1 - x;
 					int yOffset = y1 - y;
@@ -79,7 +80,7 @@ public class GuiViewRecipe extends GuiContainer {
 			}
 			
 			ItemStack result = this.parent.tile.getResult();
-			this.drawItemStack(result, x + this.info.outputX, y + this.info.outputY, null);
+			this.drawItemStack(result, x + this.info.outputX, y + this.info.outputY);
 			
 			this.drawFakeItemStackTooltip(hovered, mouseX, mouseY);
 			
@@ -102,7 +103,7 @@ public class GuiViewRecipe extends GuiContainer {
 	}
 	
 	@Override
-	protected void actionPerformed(GuiButton button) throws IOException {
+	protected void actionPerformed(GuiButton button) {
 		if (button == this.back) {
 			Minecraft.getMinecraft().displayGuiScreen(this.parent);
 		}
@@ -138,7 +139,7 @@ public class GuiViewRecipe extends GuiContainer {
 		}
 	}
 	
-    private void drawItemStack(ItemStack stack, int x, int y, String altText) {
+    private void drawItemStack(ItemStack stack, int x, int y) {
     	GlStateManager.pushMatrix();
     	net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.translate(0.0F, 0.0F, -32.0F);
@@ -148,7 +149,7 @@ public class GuiViewRecipe extends GuiContainer {
         if (font == null) font = this.fontRenderer;
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, altText);
+        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, null);
         this.zLevel = 0.0F;
         this.itemRender.zLevel = 0.0F;
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();

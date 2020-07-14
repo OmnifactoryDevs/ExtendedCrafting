@@ -4,6 +4,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public class EnderResultSlot extends Slot {
 
 	public EnderResultSlot(IInventory inventory, int index, int xPosition, int yPosition) {

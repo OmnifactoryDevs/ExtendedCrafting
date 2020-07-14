@@ -15,6 +15,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 @SideOnly(Side.CLIENT)
 public class RenderAutomationInterface extends TileEntitySpecialRenderer<TileAutomationInterface> {
 

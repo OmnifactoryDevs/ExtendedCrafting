@@ -12,7 +12,7 @@ public class CompressorRecipeManager {
 
 	private static final CompressorRecipeManager INSTANCE = new CompressorRecipeManager();
 
-	private ArrayList<CompressorRecipe> recipes = new ArrayList<>();
+	private final ArrayList<CompressorRecipe> recipes = new ArrayList<>();
 
 	public static CompressorRecipeManager getInstance() {
 		return INSTANCE;

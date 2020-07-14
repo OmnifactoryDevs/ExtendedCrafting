@@ -22,7 +22,7 @@ import java.util.List;
 public class CombinationCraftingWrapper implements IRecipeWrapper {
 
 	private final ITickTimer timer;
-	private IJeiHelpers helpers;
+	private final IJeiHelpers helpers;
 	private final CombinationRecipe recipe;
 
 	public CombinationCraftingWrapper(IJeiHelpers helpers, CombinationRecipe recipe) {

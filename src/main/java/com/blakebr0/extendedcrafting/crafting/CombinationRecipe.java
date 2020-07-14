@@ -9,11 +9,11 @@ import java.util.List;
 
 public class CombinationRecipe {
 
-	protected ItemStack output;
-	protected long cost;
-	protected int perTick;
-	protected Ingredient input;
-	protected NonNullList<Ingredient> pedestals;
+	protected final ItemStack output;
+	protected final long cost;
+	protected final int perTick;
+	protected final Ingredient input;
+	protected final NonNullList<Ingredient> pedestals;
 	
 	public CombinationRecipe(ItemStack output, long cost, Ingredient input, NonNullList<Ingredient> pedestals) {
 		this(output, cost, ModConfig.confCraftingCoreRFRate, input, pedestals);

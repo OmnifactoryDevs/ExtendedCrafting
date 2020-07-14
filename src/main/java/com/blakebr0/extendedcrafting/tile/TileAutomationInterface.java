@@ -11,6 +11,7 @@ import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.blakebr0.extendedcrafting.lib.EmptyContainer;
 import com.blakebr0.extendedcrafting.lib.FakeRecipeHandler;
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
@@ -32,12 +33,16 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Locale;
 
 // FIXME please
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TileAutomationInterface extends TileEntity implements ITickable, ISidedInventory {
 	
-	private final ItemStackHandler inventory = new StackHandler(2);
+	private final ItemStackHandler inventory = new StackHandler();
 	private final ItemStackHandler recipe = new FakeRecipeHandler();
 	private final EnergyStorageCustom energy = new EnergyStorageCustom(ModConfig.confInterfaceRFCapacity);
 	private int oldEnergy;
@@ -66,7 +71,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 			if (hasTable && this.hasRecipe() && this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate && this.ticks % 10 == 0) {
 				this.handleOutput(output);
 			}
-			
+
 			if (this.getInserterFace() != null && this.getEnergy().getEnergyStored() >= ModConfig.confInterfaceRFRate && this.ticks % 4 == 0) {
 				TileEntity tile = this.getWorld().getTileEntity(this.getPos().offset(this.getInserterFace()));
 				if (tile != null && tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.DOWN)) {
@@ -403,6 +408,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		return this.getCapability(capability, side) != null;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getCapability(@Nonnull Capability<T> capability, @Nonnull EnumFacing side) {
 		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY) {
@@ -491,11 +497,13 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		this.setHasRecipe(false);
 		this.markDirty();
 	}
-	
+
+	@Nullable
 	public EnumFacing getInserterFace() {
 		return this.autoInsert > -1 && this.autoInsert < EnumFacing.values().length ? EnumFacing.values()[this.autoInsert] : null;
 	}
-	
+
+	@Nullable
 	public EnumFacing getExtractorFace() {
 		return this.autoExtract > -1 && this.autoExtract < EnumFacing.values().length ? EnumFacing.values()[this.autoExtract] : null;
 	}
@@ -587,22 +595,19 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
 	}
 	
-	private int insertItem(IInventory matrix, int slot, ItemStack stack) {
+	private void insertItem(IInventory matrix, int slot, ItemStack stack) {
 		ItemStack slotStack = matrix.getStackInSlot(slot);
 		if (slotStack.isEmpty()) {
 			matrix.setInventorySlotContents(slot, stack);
-			return stack.getCount();
 		} else {
 			if (StackHelper.areStacksEqual(stack, slotStack) && slotStack.getCount() < slotStack.getMaxStackSize()) {
 				ItemStack newStack = slotStack.copy();
 				int newSize = Math.min(slotStack.getCount() + stack.getCount(), slotStack.getMaxStackSize());
 				newStack.setCount(newSize);
 				matrix.setInventorySlotContents(slot, newStack);
-				return newSize - slotStack.getCount();
 			}
 		}
-		
-		return 0;
+
 	}
 	
 	private NonNullList<ItemStack> getRemainingItems(IInventory matrix) {
@@ -616,8 +621,8 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	
 	class StackHandler extends ItemStackHandler {
 		
-		StackHandler(int size) {
-			super(size);
+		StackHandler() {
+			super(2);
 		}
 
 		@Override

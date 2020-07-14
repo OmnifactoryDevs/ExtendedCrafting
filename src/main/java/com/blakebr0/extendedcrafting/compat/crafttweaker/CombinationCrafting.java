@@ -37,7 +37,7 @@ public class CombinationCrafting {
 	}
 
 	private static class Add implements IAction {
-		CombinationRecipe recipe;
+		final CombinationRecipe recipe;
 
 		public Add(CombinationRecipe add) {
 			this.recipe = add;
@@ -55,7 +55,7 @@ public class CombinationCrafting {
 	}
 
 	private static class Remove implements IAction {
-		ItemStack remove;
+		final ItemStack remove;
 
 		public Remove(ItemStack remove) {
 			this.remove = remove;

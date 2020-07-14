@@ -1,22 +1,25 @@
 package com.blakebr0.extendedcrafting.compat.jei.tablecrafting;
 
-import java.util.List;
-
 import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
-
+import mcp.MethodsReturnNonnullByDefault;
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IDrawable;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
+import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeCategory;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
-public class UltimateTableCategory implements IRecipeCategory {
+import javax.annotation.Nonnull;
+import java.util.List;
+
+@MethodsReturnNonnullByDefault
+public class UltimateTableCategory implements IRecipeCategory<IRecipeWrapper> {
 
 	public static final String UID = "extendedcrafting:table_crafting_9x9";
 	private static final ResourceLocation TEXTURE = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/jei/ultimate_crafting.png");
@@ -48,11 +51,11 @@ public class UltimateTableCategory implements IRecipeCategory {
 	}
 
 	@Override
-	public void setRecipe(IRecipeLayout layout, IRecipeWrapper wrapper, IIngredients ingredients) {
+	public void setRecipe(IRecipeLayout layout, @Nonnull IRecipeWrapper wrapper, IIngredients ingredients) {
         IGuiItemStackGroup stacks = layout.getItemStacks();
 
-        List<List<ItemStack>> inputs = ingredients.getInputs(ItemStack.class);
-        List<ItemStack> outputs = ingredients.getOutputs(ItemStack.class).get(0);
+        List<List<ItemStack>> inputs = ingredients.getInputs(VanillaTypes.ITEM);
+        List<ItemStack> outputs = ingredients.getOutputs(VanillaTypes.ITEM).get(0);
         
         stacks.init(0, false, 84, 173);
         stacks.set(0, outputs);

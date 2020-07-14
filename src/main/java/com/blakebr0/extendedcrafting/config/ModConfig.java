@@ -130,12 +130,12 @@ public class ModConfig {
 	
 	private static void updateConfig() {
 		if (config.hasCategory("settings")) {
-			updateProperty("crafting_core_rf_capacity", "energy_capacity", "settings", "combination_crafting");
-			updateProperty("crafting_core_rf_rate", "energy_rate", "settings", "combination_crafting");
-			updateProperty("compressor_rf_capacity", "energy_capacity", "settings", "quantum_compression");
-			updateProperty("compressor_rf_rate", "energy_rate", "settings", "quantum_compression");
-			updateProperty("interface_rf_capacity", "energy_capacity", "settings", "automation_interface");
-			updateProperty("interface_rf_rate", "energy_rate", "settings", "automation_interface");
+			updateProperty("crafting_core_rf_capacity", "energy_capacity", "combination_crafting");
+			updateProperty("crafting_core_rf_rate", "energy_rate", "combination_crafting");
+			updateProperty("compressor_rf_capacity", "energy_capacity", "quantum_compression");
+			updateProperty("compressor_rf_rate", "energy_rate", "quantum_compression");
+			updateProperty("interface_rf_capacity", "energy_capacity", "automation_interface");
+			updateProperty("interface_rf_rate", "energy_rate", "automation_interface");
 			
 			ConfigCategory settings = config.getCategory("settings");
 			settings.remove("compressor_item_rate");
@@ -154,8 +154,8 @@ public class ModConfig {
 		}
 	}
 	
-	private static void updateProperty(String oldName, String newName, String oldCategory, String newCategory) {
-		config.moveProperty(oldCategory, oldName, newCategory);
+	private static void updateProperty(String oldName, String newName, String newCategory) {
+		config.moveProperty("settings", oldName, newCategory);
 		config.renameProperty(newCategory, oldName, newName);
 	}
 	

@@ -35,7 +35,7 @@ import java.util.*;
 @MethodsReturnNonnullByDefault
 public class TileCraftingCore extends TileEntity implements ITickable {
 
-	private final ItemStackHandler inventory = new StackHandler(1);
+	private final ItemStackHandler inventory = new StackHandler();
 	private final EnergyStorageCustom energy = new EnergyStorageCustom(ModConfig.confCraftingCoreRFCapacity);
 
 	private int progress;
@@ -252,8 +252,8 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 	}
 
 	class StackHandler extends ItemStackHandler {
-		StackHandler(int size) {
-			super(size);
+		StackHandler() {
+			super(1);
 		}
 
 		@Override

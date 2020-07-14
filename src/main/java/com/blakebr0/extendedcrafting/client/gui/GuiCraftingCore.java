@@ -18,7 +18,7 @@ public class GuiCraftingCore extends GuiContainer {
 
 	private static final ResourceLocation GUI = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/gui/crafting_core.png");
 
-	private TileCraftingCore tile;
+	private final TileCraftingCore tile;
 
 	public GuiCraftingCore(TileCraftingCore tile, ContainerCraftingCore container) {
 		super(container);
@@ -94,7 +94,7 @@ public class GuiCraftingCore extends GuiContainer {
 		this.drawTexturedModalRect(x + 7, y + 95 - i1, 178, 78 - i1, 15, i1 + 1);
 
 		CombinationRecipe recipe = this.tile.getRecipe();
-		if (this.tile != null && recipe != null) {
+		if (recipe != null) {
 			if (this.tile.getProgress() > 0 && recipe.getCost() > 0) {
 				int i2 = getProgressBarScaled(24);
 				this.drawTexturedModalRect(x + 116, y + 47, 194, 0, i2 + 1, 16);
@@ -102,7 +102,7 @@ public class GuiCraftingCore extends GuiContainer {
 		}
 	}
 	
-	private void drawItemStack(ItemStack stack, int x, int y, String altText) {
+	private void drawItemStack(ItemStack stack, int x, int y) {
     	GlStateManager.pushMatrix();
     	net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.translate(0.0F, 0.0F, -32.0F);
@@ -112,7 +112,7 @@ public class GuiCraftingCore extends GuiContainer {
         if (font == null) font = this.fontRenderer;
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, altText);
+        this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, null);
         this.zLevel = 0.0F;
         this.itemRender.zLevel = 0.0F;
         net.minecraft.client.renderer.RenderHelper.disableStandardItemLighting();
@@ -120,7 +120,7 @@ public class GuiCraftingCore extends GuiContainer {
 	}
 
 	private void drawFakeItemStack(ItemStack stack, int xOffset, int yOffset) {
-		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset, "");
+		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset);
 	}
 
 	private void drawFakeItemStackTooltip(ItemStack stack, int xOffset, int yOffset, int mouseX, int mouseY) {

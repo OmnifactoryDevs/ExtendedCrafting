@@ -1,6 +1,7 @@
 package com.blakebr0.extendedcrafting.client.container.automationinterface;
 
 import com.blakebr0.extendedcrafting.tile.TileAutomationInterface;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -8,10 +9,15 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class ContainerAutomationInterface extends Container {
 
-	public TileAutomationInterface tile;
-	public InventoryPlayer player;
+	public final TileAutomationInterface tile;
+	public final InventoryPlayer player;
 
 	public ContainerAutomationInterface(InventoryPlayer player, TileAutomationInterface tile) {
 		this.tile = tile;
@@ -20,7 +26,7 @@ public class ContainerAutomationInterface extends Container {
 		this.addSlotToContainer(new SlotItemHandler(tile.getInventory(), 0, 34, 50));
 		this.addSlotToContainer(new SlotItemHandler(tile.getInventory(), 1, 144, 50) {
 			@Override
-			public boolean isItemValid(ItemStack stack) {
+			public boolean isItemValid(@Nonnull ItemStack stack) {
 				return false;
 			}
 		});

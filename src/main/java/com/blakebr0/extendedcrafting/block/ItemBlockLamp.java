@@ -1,9 +1,11 @@
 package com.blakebr0.extendedcrafting.block;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
+@MethodsReturnNonnullByDefault
 public class ItemBlockLamp extends ItemBlock {
 
 	public ItemBlockLamp(Block block) {

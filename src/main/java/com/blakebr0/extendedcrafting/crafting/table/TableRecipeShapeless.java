@@ -21,10 +21,10 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 public class TableRecipeShapeless extends TableRecipeBase {
 
-	protected ItemStack output;
-	protected NonNullList<Ingredient> input = NonNullList.create();
-	protected ResourceLocation group;
-	protected int tier;
+	protected final ItemStack output;
+	protected final NonNullList<Ingredient> input = NonNullList.create();
+	protected final ResourceLocation group;
+	protected final int tier;
 	protected Map<Integer, Function<ItemStack, ItemStack>> transformers;
 	public int enderCrafterRecipeTimeRequired = ModConfig.confEnderTimeRequired;
 

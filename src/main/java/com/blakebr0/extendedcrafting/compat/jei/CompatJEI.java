@@ -39,8 +39,8 @@ public class CompatJEI implements IModPlugin {
 
 	public static final ResourceLocation ICONS = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/jei/icons.png");
 	
-	public static List<Block> blocks = new ArrayList<>();
-	public static List<Item> items = new ArrayList<>();
+	public static final List<Block> blocks = new ArrayList<>();
+	public static final List<Item> items = new ArrayList<>();
 	
 	@Override
 	public void registerCategories(IRecipeCategoryRegistration registry) {

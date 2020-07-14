@@ -12,7 +12,7 @@ public class CombinationRecipeManager {
 
 	private static final CombinationRecipeManager INSTANCE = new CombinationRecipeManager();
 
-	private ArrayList<CombinationRecipe> recipes = new ArrayList<CombinationRecipe>();
+	private final ArrayList<CombinationRecipe> recipes = new ArrayList<>();
 
 	public static CombinationRecipeManager getInstance() {
 		return INSTANCE;

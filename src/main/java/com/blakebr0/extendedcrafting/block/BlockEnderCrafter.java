@@ -20,6 +20,9 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
 public class BlockEnderCrafter extends BlockBase implements ITileEntityProvider, IEnableable {
 
 	public BlockEnderCrafter() {
@@ -46,11 +49,10 @@ public class BlockEnderCrafter extends BlockBase implements ITileEntityProvider,
 		TileEnderCrafter tile = (TileEnderCrafter) world.getTileEntity(pos);
 		if (tile != null) {
 			NonNullList<ItemStack> matrix = tile.getMatrix();
-			for (int i = 0; i < matrix.size(); i++) {
-				ItemStack stack = matrix.get(i);
-				this.spawnAsEntity(world, pos, stack);
+			for (ItemStack stack : matrix) {
+				spawnAsEntity(world, pos, stack);
 			}
-			this.spawnAsEntity(world, pos, tile.getResult());
+			spawnAsEntity(world, pos, tile.getResult());
 		}
 		
 		super.breakBlock(world, pos, state);

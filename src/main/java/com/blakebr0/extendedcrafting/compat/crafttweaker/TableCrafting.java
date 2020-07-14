@@ -122,7 +122,7 @@ public class TableCrafting {
 	}
 
 	private static class Add implements IAction {
-		ITieredRecipe recipe;
+		final ITieredRecipe recipe;
 
 		public Add(ITieredRecipe add) {
 			this.recipe = add;
@@ -140,7 +140,7 @@ public class TableCrafting {
 	}
 
 	private static class Remove implements IAction {
-		ItemStack remove;
+		final ItemStack remove;
 
 		public Remove(ItemStack remove) {
 			this.remove = remove;

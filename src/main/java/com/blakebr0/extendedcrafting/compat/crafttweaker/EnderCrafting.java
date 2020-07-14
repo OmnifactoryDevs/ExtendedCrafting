@@ -72,7 +72,7 @@ public class EnderCrafting {
 	}
 
 	private static class Add implements IAction {
-		IRecipe recipe;
+		final IRecipe recipe;
 
 		public Add(IRecipe add) {
 			this.recipe = add;
@@ -90,7 +90,7 @@ public class EnderCrafting {
 	}
 
 	private static class Remove implements IAction {
-		ItemStack remove;
+		final ItemStack remove;
 
 		public Remove(ItemStack remove) {
 			this.remove = remove;

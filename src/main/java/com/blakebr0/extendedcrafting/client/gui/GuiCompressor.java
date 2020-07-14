@@ -4,31 +4,29 @@ import com.blakebr0.cucumber.helper.ResourceHelper;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.client.container.ContainerCompressor;
+import com.blakebr0.extendedcrafting.crafting.CompressorRecipe;
 import com.blakebr0.extendedcrafting.network.EjectModeSwitchPacket;
 import com.blakebr0.extendedcrafting.network.InputLimitSwitchPacket;
 import com.blakebr0.extendedcrafting.network.NetworkThingy;
 import com.blakebr0.extendedcrafting.tile.TileCompressor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings("SameParameterValue")
 public class GuiCompressor extends GuiContainer {
 
 	private static final ResourceLocation GUI = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/gui/compressor.png");
 
-	private TileCompressor tile;
+	private final TileCompressor tile;
 
 	public GuiCompressor(TileCompressor tile, ContainerCompressor container) {
 		super(container);
@@ -44,65 +42,34 @@ public class GuiCompressor extends GuiContainer {
 	}
 
 	private int getMaterialBarScaled(int pixels) {
-		int i = MathHelper.clamp(this.tile.getMaterialCount(), 0, this.tile.getRecipe().getInputCount());
-		int j = this.tile.getRecipe().getInputCount();
+		CompressorRecipe recipe = this.tile.getRecipe();
+		if (recipe == null) {
+			return 0;
+		}
+		int i = MathHelper.clamp(this.tile.getMaterialCount(), 0, recipe.getInputCount());
+		int j = recipe.getInputCount();
 		return j != 0 && i != 0 ? i * pixels / j : 0;
 	}
 
 	private int getProgressBarScaled(int pixels) {
 		int i = this.tile.getProgress();
-		int j = this.tile.getRecipe().getPowerCost();
+		CompressorRecipe recipe = this.tile.getRecipe();
+		if (recipe == null) {
+			return 0;
+		}
+		int j = recipe.getPowerCost();
 		return (int) (j != 0 && i != 0 ? (long) i * pixels / j : 0);
-	}
-
-	private void drawItemStack(ItemStack stack, int x, int y, String altText) {
-		GlStateManager.translate(0.0F, 0.0F, 32.0F);
-		this.zLevel = 50.0F;
-		this.itemRender.zLevel = 50.0F;
-		FontRenderer font = null;
-		if (!stack.isEmpty())
-			font = stack.getItem().getFontRenderer(stack);
-		if (font == null)
-			font = fontRenderer;
-		this.itemRender.renderItemAndEffectIntoGUI(stack, x, y);
-		this.itemRender.renderItemOverlayIntoGUI(font, stack, x, y, altText);
-		this.zLevel = 0.0F;
-		this.itemRender.zLevel = 0.0F;
-	}
-
-	private void drawFakeItemStack(ItemStack stack, int xOffset, int yOffset, int mouseX, int mouseY) {
-		GlStateManager.pushMatrix();
-		RenderHelper.enableGUIStandardItemLighting();
-		this.drawItemStack(stack, this.guiLeft + xOffset, this.guiTop + yOffset, null);
-		GlStateManager.popMatrix();
-	}
-
-	private void drawFakeItemStackTooltip(ItemStack stack, int xOffset, int yOffset, int mouseX, int mouseY) {
-		if (mouseX > this.guiLeft + xOffset - 1 && mouseX < guiLeft + xOffset + 16 && mouseY > this.guiTop + yOffset - 1 && mouseY < this.guiTop + yOffset + 16) {
-			if (!stack.isEmpty()) {
-				this.renderToolTip(stack, mouseX, mouseY);
-			}
-		}
-	}
-
-	private ItemStack getStack(Object obj) {
-		if (obj instanceof ItemStack) {
-			return ((ItemStack) obj).copy();
-		} else if (obj instanceof List) {
-			return ((List<ItemStack>) obj).get(0);
-		} else {
-			return ItemStack.EMPTY;
-		}
 	}
 
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
 		String s = Utils.localize("container.ec.compressor");
 		this.fontRenderer.drawString(s, this.xSize / 2 - this.fontRenderer.getStringWidth(s) / 2, 6, 4210752);
-		this.fontRenderer.drawString(Utils.localize("container.inventory"), 8, this.ySize - 94, 4210752);	}
+		this.fontRenderer.drawString(Utils.localize("container.inventory"), 8, this.ySize - 94, 4210752);
+	}
 
 	@Override
-	public void actionPerformed(GuiButton button) throws IOException {
+	public void actionPerformed(GuiButton button) {
 		if (button.id == 1) {
 			NetworkThingy.THINGY.sendToServer(new EjectModeSwitchPacket(this.tile.getPos().toLong()));
 		} else if (button.id == 2) {
@@ -130,7 +97,6 @@ public class GuiCompressor extends GuiContainer {
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		int left = this.guiLeft;
-		int top = this.guiTop;
 
 		this.drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -141,7 +107,7 @@ public class GuiCompressor extends GuiContainer {
 		}
 
 		if (mouseX > left + 60 && mouseX < guiLeft + 85 && mouseY > this.guiTop + 74 && mouseY < this.guiTop + 83) {
-			List<String> l = new ArrayList<String>();
+			List<String> l = new ArrayList<>();
 			if (this.tile.getMaterialCount() < 1) {
 				l.add(Utils.localize("tooltip.ec.empty"));
 			} else {
@@ -160,7 +126,7 @@ public class GuiCompressor extends GuiContainer {
 				this.drawHoveringText(Utils.localize("tooltip.ec.eject"), mouseX, mouseY);
 			}
 		}
-		
+
 		if (mouseX > guiLeft + 90 && mouseX < guiLeft + 98 && mouseY > guiTop + 73 && mouseY < guiTop + 84) {
 			if (this.tile.isLimitingInput()) {
 				this.drawHoveringText(Utils.localize("tooltip.ec.limited_input"), mouseX, mouseY);
@@ -195,13 +161,14 @@ public class GuiCompressor extends GuiContainer {
 		if (mouseX > guiLeft + 68 && mouseX < guiLeft + 79 && mouseY > guiTop + 28 && mouseY < guiTop + 39) {
 			this.drawTexturedModalRect(x + 68, y + 30, 194, 32, 11, 9);
 		}
-		
-		
+
+
+		if(this.tile == null) return;
 		if (mouseX > guiLeft + 90 && mouseX < guiLeft + 98 && mouseY > guiTop + 73 && mouseY < guiTop + 84) {
 			if (this.tile.isLimitingInput()) {
 				this.drawTexturedModalRect(x + 90, y + 74, 194, 56, 9, 10);
 			} else {
-				this.drawTexturedModalRect(x + 90, y + 74, 194, 43, 9, 10);				
+				this.drawTexturedModalRect(x + 90, y + 74, 194, 43, 9, 10);
 			}
 		} else {
 			if (this.tile.isLimitingInput()) {

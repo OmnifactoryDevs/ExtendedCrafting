@@ -29,9 +29,9 @@ import java.util.Map;
 @ParametersAreNonnullByDefault
 public class ItemSingularity extends ItemMeta implements IEnableable {
 
-	public static Map<Integer, Integer> singularityColors = new HashMap<>();
-	public static Map<Integer, Object> singularityMaterials = new HashMap<>();
-	private Configuration config = ModConfig.config;
+	public static final Map<Integer, Integer> singularityColors = new HashMap<>();
+	public static final Map<Integer, Object> singularityMaterials = new HashMap<>();
+	private final Configuration config = ModConfig.config;
 
 	public ItemSingularity() {
 		super("ec.singularity", ExtendedCrafting.REGISTRY);

@@ -1,5 +1,6 @@
 package com.blakebr0.extendedcrafting.client.container;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -11,10 +12,14 @@ import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class ContainerHandheldTable extends Container {
 
-	public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
-	public InventoryCraftResult craftResult = new InventoryCraftResult();
+	public final InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3);
+	public final InventoryCraftResult craftResult = new InventoryCraftResult();
 	private final World world;
 	private final EntityPlayer player;
 

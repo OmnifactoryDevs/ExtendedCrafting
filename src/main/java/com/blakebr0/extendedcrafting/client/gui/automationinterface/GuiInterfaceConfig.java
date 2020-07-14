@@ -1,17 +1,11 @@
 package com.blakebr0.extendedcrafting.client.gui.automationinterface;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
 import com.blakebr0.cucumber.gui.button.IconButton;
 import com.blakebr0.cucumber.lib.Colors;
 import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.network.InterfaceAutoChangePacket;
 import com.blakebr0.extendedcrafting.network.NetworkThingy;
 import com.blakebr0.extendedcrafting.tile.TileAutomationInterface;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -19,10 +13,16 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumFacing;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+@ParametersAreNonnullByDefault
 public class GuiInterfaceConfig extends GuiContainer {
 
-	private GuiAutomationInterface parent;
-	private TileAutomationInterface tile;
+	private final GuiAutomationInterface parent;
+	private final TileAutomationInterface tile;
 	public DirButton insert, extract;
 	public CheckboxButton eject, smart;
 	public GuiButton back;
@@ -72,13 +72,13 @@ public class GuiInterfaceConfig extends GuiContainer {
 		this.eject = this.addButton(new CheckboxButton(2, x + 63, y + 46, Utils.localize("ec.interface.auto_eject")));
 		this.smart = this.addButton(new CheckboxButton(3, x + 63, y + 59, Utils.localize("ec.interface.smart_insert")));
 		
-		this.back = this.addButton(new IconButton(10, x + 82, y + 74, 29, 15, 71, 210, Utils.localize("ec.interface.back"), this.parent.GUI));
+		this.back = this.addButton(new IconButton(10, x + 82, y + 74, 29, 15, 71, 210, Utils.localize("ec.interface.back"), GuiAutomationInterface.GUI));
 		
 		this.updateButtons();
 	}
 	
 	@Override
-	protected void actionPerformed(GuiButton button) throws IOException {
+	protected void actionPerformed(GuiButton button) {
 		if (button == this.back) {
 			Minecraft.getMinecraft().displayGuiScreen(this.parent);
 		} else if (button == this.insert) {
@@ -122,7 +122,7 @@ public class GuiInterfaceConfig extends GuiContainer {
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		this.mc.getTextureManager().bindTexture(this.parent.GUI);
+		this.mc.getTextureManager().bindTexture(GuiAutomationInterface.GUI);
 		int x = (this.width - this.xSize) / 2;
 		int y = (this.height - this.ySize) / 2;
 		this.drawTexturedModalRect(x, y, 0, 0, this.xSize, this.ySize);
@@ -181,13 +181,12 @@ public class GuiInterfaceConfig extends GuiContainer {
 	}
 	
 	private EnumFacing incrementFace(EnumFacing facing) {
-		if (facing == null) return EnumFacing.UP;
 		int index = facing.getIndex() + 1;
 		if (index > EnumFacing.values().length - 1) return null;
 		return EnumFacing.values()[index];
 	}
 
-    public class CheckboxButton extends GuiButton {
+    public static class CheckboxButton extends GuiButton {
     	
     	public List<String> tooltip;
     	public boolean on;
@@ -204,8 +203,7 @@ public class GuiInterfaceConfig extends GuiContainer {
 	            mc.getTextureManager().bindTexture(GuiAutomationInterface.GUI);
 	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 	            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-	            int i = this.getHoverState(this.hovered);
-	            GlStateManager.enableBlend();
+		        GlStateManager.enableBlend();
 	            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 	            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 	            this.drawTexturedModalRect(this.x, this.y, 72, 197, this.width, this.height);
@@ -224,7 +222,7 @@ public class GuiInterfaceConfig extends GuiContainer {
 	    }
     }
     
-    public class DirButton extends GuiButton {
+    public static class DirButton extends GuiButton {
     	
     	public EnumFacing facing;
     	public List<String> tooltip;
@@ -241,8 +239,7 @@ public class GuiInterfaceConfig extends GuiContainer {
 	            mc.getTextureManager().bindTexture(GuiAutomationInterface.GUI);
 	            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 	            this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-	            int i = this.getHoverState(this.hovered);
-	            GlStateManager.enableBlend();
+		        GlStateManager.enableBlend();
 	            GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
 	            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 	            this.drawTexturedModalRect(this.x, this.y, 72, 197, this.width, this.height);
@@ -257,7 +254,6 @@ public class GuiInterfaceConfig extends GuiContainer {
 	    }
 		
 		private int getIndex(EnumFacing facing) {
-			if (facing == null) return 0;
 			return facing.getIndex();
 		}
     }

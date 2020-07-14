@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class ItemMaterial extends ItemMeta {
 	
-	public static Set<Integer> ultimateMetas = new HashSet<>(Arrays.asList(13, 19, 32, 33, 40, 41, 48, 49));
+	public static final Set<Integer> ultimateMetas = new HashSet<>(Arrays.asList(13, 19, 32, 33, 40, 41, 48, 49));
 
 	public static ItemStack itemBlackIron;
 	public static ItemStack itemBlackIronNugget;

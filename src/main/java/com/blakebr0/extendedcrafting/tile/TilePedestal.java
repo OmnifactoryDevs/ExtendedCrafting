@@ -21,7 +21,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class TilePedestal extends TileEntity {
 
-	private ItemStackHandler inventory = new StackHandler(1);
+	private final ItemStackHandler inventory = new StackHandler();
 
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
@@ -80,8 +80,8 @@ public class TilePedestal extends TileEntity {
 	}
 
 	class StackHandler extends ItemStackHandler {
-		StackHandler(int size) {
-			super(size);
+		StackHandler() {
+			super(1);
 		}
 
 		@Override

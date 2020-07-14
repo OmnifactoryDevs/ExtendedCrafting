@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 @MethodsReturnNonnullByDefault
 public class TableCraftResult extends InventoryCraftResult {
 
-	private IExtendedTable tile;
+	private final IExtendedTable tile;
 
 	public TableCraftResult(IExtendedTable tile) {
 		this.tile = tile;

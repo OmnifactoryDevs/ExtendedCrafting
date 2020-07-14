@@ -7,7 +7,6 @@ import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.client.gui.GuiHandler;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.tile.TileCraftingCore;
-
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -23,6 +22,10 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@SuppressWarnings("deprecation")
+@ParametersAreNonnullByDefault
 public class BlockCraftingCore extends BlockBase implements ITileEntityProvider, IEnableable {
 
 	public BlockCraftingCore() {
@@ -68,7 +71,7 @@ public class BlockCraftingCore extends BlockBase implements ITileEntityProvider,
 		TileCraftingCore tile = (TileCraftingCore) world.getTileEntity(pos);
 		if (tile != null) {
 			ItemStack stack = tile.getInventory().getStackInSlot(0);
-			this.spawnAsEntity(world, pos, stack);
+			spawnAsEntity(world, pos, stack);
 		}
 		
 		super.breakBlock(world, pos, state);

@@ -18,7 +18,7 @@ public class ConfigGui extends GuiConfig {
 	}
 
 	private static List<IConfigElement> getConfigElements() {
-		List<IConfigElement> list = new ArrayList<IConfigElement>();
+		List<IConfigElement> list = new ArrayList<>();
 
 		for (String category : ModConfig.config.getCategoryNames()) {
 			list.add(new ConfigElement(ModConfig.config.getCategory(category)));

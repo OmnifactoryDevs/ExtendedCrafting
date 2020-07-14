@@ -19,7 +19,7 @@ import java.util.List;
 public class EnderCrafterRecipeManager {
 
 	private static final EnderCrafterRecipeManager INSTANCE = new EnderCrafterRecipeManager();
-	private List<IRecipe> recipes = new ArrayList<>();
+	private final List<IRecipe> recipes = new ArrayList<>();
 
 	public static EnderCrafterRecipeManager getInstance() {
 		return INSTANCE;

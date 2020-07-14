@@ -10,10 +10,11 @@ import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 
+@SuppressWarnings("SameParameterValue")
 public class GuiEnderCrafter extends GuiContainer {
 
 	private static final ResourceLocation GUI = ResourceHelper.getResource(ExtendedCrafting.MOD_ID, "textures/gui/ender_crafter.png");
-	private TileEnderCrafter tile;
+	private final TileEnderCrafter tile;
 
 	public GuiEnderCrafter(TileEnderCrafter tile, ContainerEnderCrafter container) {
 		super(container);

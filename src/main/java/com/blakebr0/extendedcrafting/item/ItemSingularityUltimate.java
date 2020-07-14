@@ -28,9 +28,9 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 
-	public static ArrayList<ItemStack> singularities = new ArrayList<>();
-	public static ArrayList<Integer> blacklistDefaults = new ArrayList<>();
-	public static ArrayList<Integer> blacklistCustoms = new ArrayList<>();
+	public static final ArrayList<ItemStack> singularities = new ArrayList<>();
+	public static final ArrayList<Integer> blacklistDefaults = new ArrayList<>();
+	public static final ArrayList<Integer> blacklistCustoms = new ArrayList<>();
 
 	public ItemSingularityUltimate() {
 		super("ec.singularity_ultimate");
