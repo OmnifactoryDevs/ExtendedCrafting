@@ -37,7 +37,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-// FIXME please
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TileAutomationInterface extends TileEntity implements ITickable, ISidedInventory {
