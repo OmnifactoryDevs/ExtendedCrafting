@@ -7,7 +7,6 @@ import com.blakebr0.extendedcrafting.crafting.endercrafter.EnderCrafterRecipeMan
 import com.blakebr0.extendedcrafting.crafting.endercrafter.IEnderCraftingRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableCrafting;
 import com.blakebr0.extendedcrafting.lib.EmptyContainer;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -16,12 +15,9 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class TileEnderCrafter extends AbstractExtendedTable implements ITickable {
 
 	private int progress;
@@ -35,43 +31,46 @@ public class TileEnderCrafter extends AbstractExtendedTable implements ITickable
 
 	@Override
 	public void update() {
-		if (!this.getWorld().isRemote) {
-			TableCrafting crafting = tableCrafting;
-			IEnderCraftingRecipe recipe = EnderCrafterRecipeManager.getInstance().findMatchingRecipe(crafting, this.getWorld());
-			ItemStack result = recipe == null ? ItemStack.EMPTY : recipe.getCraftingResult(crafting);
-			ItemStack output = this.getResult();
-			if (!result.isEmpty() && (output.isEmpty() || StackHelper.canCombineStacks(output, result))) {
-				List<BlockPos> alternators = this.getAlternatorPositions();
-				int alternatorCount = alternators.size();
+		if (this.getWorld().isRemote) {
+			return;
+		}
 
-				if (alternatorCount > 0 && recipe != null) {
-					this.progress(alternatorCount, recipe.getEnderCrafterTimeSeconds());
-					
-					for (BlockPos pos : alternators) {
-						if (this.getWorld().isAirBlock(pos.up())) {
-							((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.PORTAL, false, pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 1, 0, 0, 0, 0.1D);
-						}
-					}
-					
-					if (this.progress >= this.progressReq) {
-						for (int i = 0; i < this.matrix.size(); i++) {
-							this.decrStackSize(i, 1);
-						}
-						
-						this.updateResult(result);
-						this.progress = 0;
-					}
-					
-					this.markDirty();
-				}
-			} else {
-				if (this.progress > 0 || this.progressReq > 0) {
-					this.progress = 0;
-					this.progressReq = 0;
-					this.markDirty();
-				}
+		IEnderCraftingRecipe recipe = EnderCrafterRecipeManager.getInstance().findMatchingRecipe(tableCrafting, this.getWorld());
+		ItemStack result = recipe == null ? ItemStack.EMPTY : recipe.getCraftingResult(tableCrafting);
+		ItemStack output = this.getResult();
+		if (result.isEmpty() || (!output.isEmpty() && !StackHelper.canCombineStacks(output, result))) {
+			if (this.progress > 0 || this.progressReq > 0) {
+				this.progress = 0;
+				this.progressReq = 0;
+				this.markDirty();
+			}
+			return;
+		}
+
+		List<BlockPos> alternators = this.getAlternatorPositions();
+
+		if (alternators.isEmpty() || recipe == null) {
+			return;
+		}
+
+		this.progress(alternators.size(), recipe.getEnderCrafterTimeSeconds());
+
+		for (BlockPos pos : alternators) {
+			if (this.getWorld().isAirBlock(pos.up())) {
+				((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.PORTAL, false, pos.getX() + 0.5D, pos.getY() + 1.0D, pos.getZ() + 0.5D, 1, 0, 0, 0, 0.1D);
 			}
 		}
+
+		if (this.progress >= this.progressReq) {
+			for (int i = 0; i < this.matrix.size(); i++) {
+				this.decrStackSize(i, 1);
+			}
+
+			this.updateResult(result);
+			this.progress = 0;
+		}
+
+		this.markDirty();
 	}
 
 	@Override
