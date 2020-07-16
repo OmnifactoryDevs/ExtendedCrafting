@@ -112,6 +112,10 @@ public class TileEnderCrafter extends AbstractExtendedTable implements ITickable
 		
 		return alternators;
 	}
+
+	public int getProgressRequired() {
+		return this.progressReq;
+	}
 	
 	public int getProgress() {
 		return this.progress;
