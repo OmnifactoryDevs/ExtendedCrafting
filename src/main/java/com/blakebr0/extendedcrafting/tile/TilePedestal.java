@@ -1,13 +1,8 @@
 package com.blakebr0.extendedcrafting.tile;
 
-import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
-
-import mcp.MethodsReturnNonnullByDefault;
+import com.blakebr0.cucumber.tile.TileEntityBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -15,11 +10,8 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class TilePedestal extends TileEntity {
+public class TilePedestal extends TileEntityBase {
 
 	private final ItemStackHandler inventory = new StackHandler();
 
@@ -34,27 +26,6 @@ public class TilePedestal extends TileEntity {
 		tag = super.writeToNBT(tag);
 		tag.merge(this.inventory.serializeNBT());
 		return tag;
-	}
-
-	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.getPos(), -1, this.getUpdateTag());
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager manager, SPacketUpdateTileEntity packet) {
-		this.readFromNBT(packet.getNbtCompound());
-	}
-
-	@Override
-	public final NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
-	}
-
-	@Override
-	public void markDirty() {
-		super.markDirty();
-		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
 	}
 
 	@Override

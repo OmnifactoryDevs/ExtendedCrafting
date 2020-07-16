@@ -6,8 +6,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.NonNullList;
 
 public abstract class AbstractExtendedTable extends TileInventoryBase implements IInventory, IExtendedTable {
@@ -15,6 +13,12 @@ public abstract class AbstractExtendedTable extends TileInventoryBase implements
 	protected final int lineSize;
 	protected NonNullList<ItemStack> matrix;
 	protected ItemStack result = ItemStack.EMPTY;
+
+	public AbstractExtendedTable(String unlocalizedName) {
+		super(unlocalizedName);
+		lineSize = 3;
+		matrix = NonNullList.withSize(lineSize * lineSize, ItemStack.EMPTY);
+	}
 
 	public AbstractExtendedTable(int lineSize, String tier) {
 		super("table_" + tier);
@@ -43,16 +47,6 @@ public abstract class AbstractExtendedTable extends TileInventoryBase implements
 
 		this.result = new ItemStack(tag.getCompoundTag("Result"));
 		ItemStackHelper.loadAllItems(tag, this.matrix);
-	}
-
-	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.getPos(), -1, this.getUpdateTag());
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager manager, SPacketUpdateTileEntity packet) {
-		this.readFromNBT(packet.getNbtCompound());
 	}
 
 	@Override

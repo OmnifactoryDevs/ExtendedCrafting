@@ -1,14 +1,15 @@
 package com.blakebr0.extendedcrafting.tile;
 
+import com.blakebr0.cucumber.tile.TileEntityBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nonnull;
 
-public abstract class TileInventoryBase extends TileEntity implements IInventory {
+// extending this sends a packet each time this is marked dirty, should that be considered excessive?
+public abstract class TileInventoryBase extends TileEntityBase implements IInventory {
 
 	private final String unlocalizedName;
 

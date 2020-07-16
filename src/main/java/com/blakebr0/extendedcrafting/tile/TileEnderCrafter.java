@@ -1,47 +1,42 @@
 package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.cucumber.helper.StackHelper;
-import com.blakebr0.cucumber.tile.TileEntityBase;
 import com.blakebr0.extendedcrafting.block.BlockEnderAlternator;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.endercrafter.EnderCrafterRecipeManager;
 import com.blakebr0.extendedcrafting.crafting.endercrafter.IEnderCraftingRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableCrafting;
 import com.blakebr0.extendedcrafting.lib.EmptyContainer;
-import com.blakebr0.extendedcrafting.lib.IExtendedTable;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.WorldServer;
 
-import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TileEnderCrafter extends TileEntityBase implements IInventory, ITickable, IExtendedTable {
+public class TileEnderCrafter extends AbstractExtendedTable implements ITickable {
 
-	private NonNullList<ItemStack> matrix = NonNullList.withSize(9, ItemStack.EMPTY);
-	private ItemStack result = ItemStack.EMPTY;
 	private int progress;
 	private int progressReq;
-	
+	private TableCrafting tableCrafting;
+
+	public TileEnderCrafter() {
+		super("ender_crafter");
+		tableCrafting = new TableCrafting(new EmptyContainer(), this);
+	}
+
 	@Override
 	public void update() {
 		if (!this.getWorld().isRemote) {
-			TableCrafting crafting = new TableCrafting(new EmptyContainer(), this);
+			TableCrafting crafting = tableCrafting;
 			IEnderCraftingRecipe recipe = EnderCrafterRecipeManager.getInstance().findMatchingRecipe(crafting, this.getWorld());
 			ItemStack result = recipe == null ? ItemStack.EMPTY : recipe.getCraftingResult(crafting);
 			ItemStack output = this.getResult();
@@ -82,13 +77,6 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound tag) {
 		tag = super.writeToNBT(tag);
-		tag.merge(ItemStackHelper.saveAllItems(tag, this.matrix));
-		
-		if (!this.result.isEmpty()) {
-			tag.setTag("Result", this.result.serializeNBT());
-		} else {
-			tag.removeTag("Result");
-		}
 		
 		tag.setInteger("Progress", this.progress);
 		tag.setInteger("ProgressReq", this.progressReq);
@@ -99,36 +87,9 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 	@Override
 	public void readFromNBT(NBTTagCompound tag) {
 		super.readFromNBT(tag);
-		ItemStackHelper.loadAllItems(tag, this.matrix);
-		this.result = new ItemStack(tag.getCompoundTag("Result"));
-		
+
 		this.progress = tag.getInteger("Progress");
 		this.progressReq = tag.getInteger("ProgressReq");
-	}
-	
-	@Override
-	public ItemStack getResult() {
-		return this.result;
-	}
-	
-	@Override
-	public NonNullList<ItemStack> getMatrix() {
-		return this.matrix;
-	}
-
-	@Override
-	public void setResult(ItemStack result) {
-		this.result = result;
-	}
-
-	@Override
-	public void setInventorySlotContents(int slot, ItemStack stack) {
-		this.matrix.set(slot, stack);
-	}
-	
-	@Override
-	public int getLineSize() {
-		return 3;
 	}
 	
 	public void updateResult(ItemStack result) {
@@ -162,95 +123,5 @@ public class TileEnderCrafter extends TileEntityBase implements IInventory, ITic
 		int timeReq = 20 * timeRequired;
 		this.progressReq = (int) Math.max(timeReq - (timeReq * (ModConfig.confEnderAlternatorEff * alternators)), 20);
 	}
-	
-	public int getProgressRequired() {
-		return this.progressReq;
-	}
 
-	@Override
-	public String getName() {
-		return getDisplayName().getFormattedText();
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
-	}
-
-	@Override
-	public int getSizeInventory() {
-		return 9;
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return this.matrix.isEmpty() && this.result.isEmpty();
-	}
-
-	@Override
-	public ItemStack getStackInSlot(int index) {
-		return this.matrix.get(index);
-	}
-
-	@Override
-	public ItemStack decrStackSize(int index, int count) {
-		return ItemStackHelper.getAndSplit(this.matrix, index, count);
-	}
-
-	@Override
-	public ItemStack removeStackFromSlot(int index) {
-		return ItemStackHelper.getAndRemove(this.matrix, index);
-	}
-
-	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
-		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-		
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-		
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int index, ItemStack stack) {
-		return false;
-	}
-
-	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-		
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
-	public void clear() {
-		this.matrix = NonNullList.withSize(9, ItemStack.EMPTY);
-		this.setResult(ItemStack.EMPTY);
-	}
-
-	@Nonnull
-	@Override
-	public ITextComponent getDisplayName() {
-		return new TextComponentTranslation("tile.ec.ender_crafter.name");
-	}
 }
