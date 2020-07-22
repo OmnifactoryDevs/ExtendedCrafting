@@ -55,7 +55,7 @@ public abstract class AbstractTableBlock extends BlockBase implements ITileEntit
 		if (!world.isRemote) {
 			TileEntity tileentity = world.getTileEntity(pos);
 
-			if (tileentity instanceof TileAdvancedCraftingTable) {
+			if (tileentity instanceof AbstractExtendedTable) {
 				player.openGui(ExtendedCrafting.instance, GuiHandler.BASIC_TABLE + tier.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
 			}
 

@@ -5,14 +5,9 @@ import com.blakebr0.extendedcrafting.crafting.endercrafter.EnderCrafterRecipeMan
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
 import com.blakebr0.extendedcrafting.item.ItemMaterial;
 import com.blakebr0.extendedcrafting.item.ModItems;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.oredict.OreIngredient;
 
 public class ModRecipes {
 
@@ -58,6 +53,7 @@ public class ModRecipes {
 		ModItems.itemSingularityUltimate.initRecipe();
 
 		// test recipes
+		/*
 		if (Loader.isModLoaded("mcp")) {
 			CombinationRecipeManager.getInstance().addRecipe(new ItemStack(Items.DIAMOND), 50000, 100,
 
@@ -123,6 +119,7 @@ public class ModRecipes {
 					Ingredient.fromStacks(ItemMaterial.itemUltimateCatalyst), false,
 					1000000);
 		}
+		 */
 	}
 
 	public static void post() {
