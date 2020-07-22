@@ -34,4 +34,5 @@ public class TableCraftResult extends InventoryCraftResult {
 	public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
 		this.tile.setResult(stack);
 	}
+
 }

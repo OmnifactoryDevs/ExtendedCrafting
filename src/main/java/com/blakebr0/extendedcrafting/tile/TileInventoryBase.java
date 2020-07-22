@@ -1,15 +1,18 @@
 package com.blakebr0.extendedcrafting.tile;
 
-import com.blakebr0.cucumber.tile.TileEntityBase;
+import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nonnull;
 
-// extending this sends a packet each time this is marked dirty, should that be considered excessive?
-public abstract class TileInventoryBase extends TileEntityBase implements IInventory {
+public abstract class TileInventoryBase extends TileEntity implements IInventory {
 
 	private final String unlocalizedName;
 
@@ -63,6 +66,27 @@ public abstract class TileInventoryBase extends TileEntityBase implements IInven
 	@Override
 	public boolean isUsableByPlayer(EntityPlayer player) {
 		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
+	}
+
+	public SPacketUpdateTileEntity getUpdatePacket() {
+		return new SPacketUpdateTileEntity(this.getPos(), -1, this.getUpdateTag());
+	}
+
+	public void onDataPacket(NetworkManager manager, SPacketUpdateTileEntity packet) {
+		this.readFromNBT(packet.getNbtCompound());
+	}
+
+	public final NBTTagCompound getUpdateTag() {
+		return this.writeToNBT(new NBTTagCompound());
+	}
+
+	public void markDirty() {
+		super.markDirty();
+		dirtyPacket();
+	}
+
+	protected void dirtyPacket() {
+		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
 	}
 
 }

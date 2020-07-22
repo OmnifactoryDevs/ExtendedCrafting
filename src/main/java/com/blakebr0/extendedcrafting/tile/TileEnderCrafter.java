@@ -1,6 +1,7 @@
 package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.cucumber.helper.StackHelper;
+import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import com.blakebr0.extendedcrafting.block.BlockEnderAlternator;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.endercrafter.EnderCrafterRecipeManager;
@@ -127,4 +128,8 @@ public class TileEnderCrafter extends AbstractExtendedTable implements ITickable
 		this.progressReq = (int) Math.max(timeReq - (timeReq * (ModConfig.confEnderAlternatorEff * alternators)), 20);
 	}
 
+	@Override
+	protected void dirtyPacket() {
+		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
+	}
 }

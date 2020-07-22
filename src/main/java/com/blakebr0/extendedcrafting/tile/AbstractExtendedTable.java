@@ -109,4 +109,8 @@ public abstract class AbstractExtendedTable extends TileInventoryBase implements
 		this.matrix = NonNullList.withSize(getSizeInventory(), ItemStack.EMPTY);
 		this.setResult(ItemStack.EMPTY);
 	}
+
+	@Override
+	protected void dirtyPacket() {
+	}
 }
