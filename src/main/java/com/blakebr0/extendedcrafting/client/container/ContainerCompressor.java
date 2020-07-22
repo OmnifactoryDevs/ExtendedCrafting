@@ -4,18 +4,12 @@ import com.blakebr0.cucumber.inventory.slot.SlotOutput;
 import com.blakebr0.cucumber.inventory.slot.SlotSingle;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipe;
 import com.blakebr0.extendedcrafting.tile.TileCompressor;
-
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ContainerCompressor extends Container {
 
 	public CombinationRecipe recipe;

@@ -1,7 +1,6 @@
 package com.blakebr0.extendedcrafting.client.container.automationinterface;
 
 import com.blakebr0.extendedcrafting.tile.TileAutomationInterface;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
@@ -10,10 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ContainerAutomationInterface extends Container {
 
 	public final TileAutomationInterface tile;
