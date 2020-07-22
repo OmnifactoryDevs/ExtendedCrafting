@@ -7,7 +7,6 @@ import com.blakebr0.extendedcrafting.block.BlockPedestal;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipe;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipeManager;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -28,11 +27,8 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class TileCraftingCore extends TileEntity implements ITickable {
 
 	private final ItemStackHandler inventory = new StackHandler();

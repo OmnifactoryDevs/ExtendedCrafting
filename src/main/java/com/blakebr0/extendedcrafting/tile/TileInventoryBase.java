@@ -60,4 +60,9 @@ public abstract class TileInventoryBase extends TileEntityBase implements IInven
 		return 0;
 	}
 
+	@Override
+	public boolean isUsableByPlayer(EntityPlayer player) {
+		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
+	}
+
 }

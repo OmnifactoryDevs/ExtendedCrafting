@@ -2,39 +2,27 @@ package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
-import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipe;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class TileCompressor extends TileEntity implements ISidedInventory, ITickable {
+public class TileCompressor extends TileInventoryBase implements ISidedInventory, ITickable {
 
 	private NonNullList<ItemStack> inventoryStacks = NonNullList.withSize(3, ItemStack.EMPTY);
 	private final EnergyStorageCustom energy = new EnergyStorageCustom(ModConfig.confCompressorRFCapacity);
@@ -44,6 +32,10 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 	private boolean ejecting = false;
 	private int oldEnergy;
 	private boolean inputLimit = true;
+
+	public TileCompressor() {
+		super("compressor");
+	}
 
 	private List<CompressorRecipe> getValidRecipes(ItemStack stack) {
 		List<CompressorRecipe> valid = new ArrayList<>();
@@ -229,27 +221,6 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 		return 0;
 	}
 
-	@Override
-	public void markDirty() {
-		super.markDirty();
-		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
-	}
-
-	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.getPos(), -1, this.getUpdateTag());
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager manager, SPacketUpdateTileEntity packet) {
-		this.readFromNBT(packet.getNbtCompound());
-	}
-
-	@Override
-	public final NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
-	}
-
 	public EnergyStorageCustom getEnergy() {
 		return this.energy;
 	}
@@ -327,26 +298,6 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
-		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-
-	}
-
-	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		if (index == 2) {
 			return false;
@@ -356,33 +307,7 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
-
-	}
-
-	@Override
-	public String getName() {
-		return getDisplayName().getFormattedText();
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 
 	@Override
@@ -415,11 +340,5 @@ public class TileCompressor extends TileEntity implements ISidedInventory, ITick
 		}
 
 		return super.getCapability(capability, facing);
-	}
-
-	@Nonnull
-	@Override
-	public ITextComponent getDisplayName() {
-		return new TextComponentTranslation("tile.ec.compressor.name");
 	}
 }

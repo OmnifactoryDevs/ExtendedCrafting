@@ -94,6 +94,6 @@ public class ContainerAutomationInterface extends Container {
 
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		return this.tile.isUseableByPlayer(player);
+		return this.tile.isUsableByPlayer(player);
 	}
 }

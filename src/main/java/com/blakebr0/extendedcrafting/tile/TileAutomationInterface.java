@@ -2,7 +2,6 @@ package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
-import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.endercrafter.EnderCrafterRecipeManager;
 import com.blakebr0.extendedcrafting.crafting.table.TableCrafting;
@@ -11,19 +10,14 @@ import com.blakebr0.extendedcrafting.lib.EmptyContainer;
 import com.blakebr0.extendedcrafting.lib.FakeRecipeHandler;
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -39,7 +33,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class TileAutomationInterface extends TileEntity implements ITickable, ISidedInventory {
+public class TileAutomationInterface extends TileInventoryBase implements ITickable, ISidedInventory {
 
 	private final ItemStackHandler inventory = new StackHandler();
 	private final ItemStackHandler recipe = new FakeRecipeHandler();
@@ -53,6 +47,10 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	private boolean autoEject = false;
 	private boolean smartInsert = true;
 	private int ticks = 0;
+
+	public TileAutomationInterface() {
+		super("interface");
+	}
 
 	@Override
 	public void update() {
@@ -119,14 +117,14 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 					continue;
 				}
 				ItemStack newStack = cap.extractItem(slot, 1, false);
-				if(newStack.isEmpty()) {
+				if (newStack.isEmpty()) {
 					continue;
 				}
 				this.getInventory().insertItem(0, toInsert, false);
 			} else {
 				ItemStack toInsert = StackHelper.withSize(stack.copy(), 1, false);
 				ItemStack newStack = cap.insertItem(slot, toInsert, false);
-				if(!newStack.isEmpty()) {
+				if (!newStack.isEmpty()) {
 					continue;
 				}
 				stack.shrink(1);
@@ -146,7 +144,7 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 
 		if (canInsert) {
 			table = this.getTable();
-			if(table == null) {
+			if (table == null) {
 				return;
 			}
 
@@ -275,27 +273,6 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	}
 
 	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(this.getPos(), -1, this.getUpdateTag());
-	}
-
-	@Override
-	public void onDataPacket(NetworkManager manager, SPacketUpdateTileEntity packet) {
-		this.readFromNBT(packet.getNbtCompound());
-	}
-
-	@Override
-	public final NBTTagCompound getUpdateTag() {
-		return this.writeToNBT(new NBTTagCompound());
-	}
-
-	@Override
-	public void markDirty() {
-		super.markDirty();
-		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
-	}
-
-	@Override
 	public int getSizeInventory() {
 		return this.inventory.getSlots();
 	}
@@ -347,58 +324,12 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 	}
 
 	@Override
-	public int getInventoryStackLimit() {
-		return 64;
-	}
-
-	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
-		return this.isUseableByPlayer(player);
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-
-	}
-
-	@Override
 	public boolean isItemValidForSlot(int index, ItemStack stack) {
 		return true;
 	}
 
 	@Override
-	public int getField(int id) {
-		return 0;
-	}
-
-	@Override
-	public void setField(int id, int value) {
-
-	}
-
-	@Override
-	public int getFieldCount() {
-		return 0;
-	}
-
-	@Override
 	public void clear() {
-
-	}
-
-	@Override
-	public String getName() {
-		return getDisplayName().getFormattedText();
-	}
-
-	@Override
-	public boolean hasCustomName() {
-		return false;
 	}
 
 	@Override
@@ -599,10 +530,6 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		this.markDirty();
 	}
 
-	public boolean isUseableByPlayer(EntityPlayer player) {
-		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
-	}
-
 	private void insertItem(IInventory matrix, int slot, ItemStack stack) {
 		ItemStack slotStack = matrix.getStackInSlot(slot);
 		if (slotStack.isEmpty()) {
@@ -637,11 +564,5 @@ public class TileAutomationInterface extends TileEntity implements ITickable, IS
 		public void onContentsChanged(int slot) {
 			TileAutomationInterface.this.markDirty();
 		}
-	}
-
-	@Nonnull
-	@Override
-	public ITextComponent getDisplayName() {
-		return new TextComponentTranslation("tile.ec.interface.name");
 	}
 }

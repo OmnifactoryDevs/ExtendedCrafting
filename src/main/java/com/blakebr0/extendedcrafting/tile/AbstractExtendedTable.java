@@ -1,7 +1,6 @@
 package com.blakebr0.extendedcrafting.tile;
 
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
@@ -98,11 +97,6 @@ public abstract class AbstractExtendedTable extends TileInventoryBase implements
 	@Override
 	public ItemStack removeStackFromSlot(int index) {
 		return ItemStackHelper.getAndRemove(this.matrix, index);
-	}
-
-	@Override
-	public boolean isUsableByPlayer(EntityPlayer player) {
-		return this.getWorld().getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64;
 	}
 
 	@Override
