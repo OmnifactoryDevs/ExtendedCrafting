@@ -15,102 +15,131 @@ import mcp.mobius.waila.api.IWailaConfigHandler;
 import mcp.mobius.waila.api.IWailaDataAccessor;
 import mcp.mobius.waila.api.IWailaDataProvider;
 import mcp.mobius.waila.api.IWailaRegistrar;
-import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 
+import javax.annotation.Nonnull;
 import java.util.List;
+
+import static com.blakebr0.extendedcrafting.compat.WailaDataProvider.TooltipProvider.of;
 
 @MethodsReturnNonnullByDefault
 @SuppressWarnings("unused")
 public class WailaDataProvider implements IWailaDataProvider {
 
 	public static void callbackRegister(IWailaRegistrar registrar) {
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockLamp.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockTrimmed.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockBasicTable.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockAdvancedTable.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockEliteTable.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockUltimateTable.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockPedestal.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockCraftingCore.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockAutomationInterface.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockEnderCrafter.class);
-		registrar.registerBodyProvider(new WailaDataProvider(), BlockCompressor.class);
+		registrar.registerBodyProvider(of((stack, tooltip, data, config) ->
+						tooltip.add(Utils.localize("tooltip.ec.lamp_" + BlockLamp.Type.byMetadata(data.getMetadata()).getName()))),
+				BlockLamp.class
+		);
+
+		registrar.registerBodyProvider(of((stack, tooltip, data, config) ->
+						tooltip.add(Utils.localize("tooltip.ec.trimmed_" + BlockTrimmed.Type.byMetadata(data.getMetadata()).getName()))),
+				BlockTrimmed.class
+		);
+
+		registrar.registerBodyProvider(checkTile(TilePedestal.class, (stack, tooltip, data, config, pedestal) -> {
+					ItemStack result = pedestal.getStack();
+					if (!result.isEmpty()) {
+						tooltip.add(result.getDisplayName());
+					}
+				}),
+				BlockPedestal.class
+		);
+
+		registrar.registerBodyProvider(checkTile(TileCraftingCore.class, (stack, tooltip, data, config, core) -> {
+					if (ModConfig.confEnergyInWaila) {
+						tooltip.add(Utils.format(core.getEnergy().getEnergyStored()) + " FE");
+					}
+
+					CombinationRecipe recipe = core.getRecipe();
+					ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
+					tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
+				}),
+				BlockCraftingCore.class
+		);
+
+		registrar.registerBodyProvider(checkTile(TileAutomationInterface.class, (stack, tooltip, data, config, auto) -> {
+					if (ModConfig.confEnergyInWaila) {
+						tooltip.add(Utils.format(auto.getEnergy().getEnergyStored()) + " FE");
+					}
+
+					ItemStack result = auto.getResult();
+					if (!result.isEmpty()) {
+						tooltip.add(Utils.localize("tooltip.ec.crafting", result.getCount(), result.getDisplayName()));
+					}
+				}),
+				BlockAutomationInterface.class
+		);
+
+		registrar.registerBodyProvider(checkTile(TileEnderCrafter.class, (stack, tooltip, data, config, crafter) -> {
+					ItemStack result = crafter.getResult();
+					if (!result.isEmpty()) {
+						tooltip.add(Utils.localize("tooltip.ec.output", result.getCount(), result.getDisplayName()));
+					}
+				}),
+				BlockEnderCrafter.class
+		);
+
+		registrar.registerBodyProvider(checkTile(TileCompressor.class, (stack, tooltip, data, config, compressor) -> {
+					if (ModConfig.confEnergyInWaila) {
+						tooltip.add(Utils.format(compressor.getEnergy().getEnergyStored()) + " FE");
+					}
+
+					CompressorRecipe recipe = compressor.getRecipe();
+					ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
+					tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
+				}),
+				BlockCompressor.class
+		);
+
+		registrar.registerBodyProvider(table(1), BlockBasicTable.class);
+		registrar.registerBodyProvider(table(2), BlockAdvancedTable.class);
+		registrar.registerBodyProvider(table(3), BlockEliteTable.class);
+		registrar.registerBodyProvider(table(4), BlockUltimateTable.class);
 	}
 
-	@Override
-	public List<String> getWailaBody(ItemStack stack, List<String> tooltip, IWailaDataAccessor data, IWailaConfigHandler config) {
-		Block block = data.getBlock();
-		TileEntity tile = data.getTileEntity();
-		
-		if (block instanceof BlockLamp) {
-			tooltip.add(Utils.localize("tooltip.ec.lamp_" + BlockLamp.Type.byMetadata(data.getMetadata()).getName()));
-		}
-		
-		if (block instanceof BlockTrimmed) {
-			tooltip.add(Utils.localize("tooltip.ec.trimmed_" + BlockTrimmed.Type.byMetadata(data.getMetadata()).getName()));
-		}
-		
-		if (block instanceof BlockPedestal && tile instanceof TilePedestal && !tile.isInvalid()) {
-			TilePedestal pedestal = (TilePedestal) tile;
-			ItemStack result = pedestal.getStack();
-			if (!result.isEmpty()) {
-				tooltip.add(result.getDisplayName());
-			}
-		}
-		
-		if (block instanceof BlockCraftingCore && tile instanceof TileCraftingCore && !tile.isInvalid()) {
-			TileCraftingCore core = (TileCraftingCore) tile;
-			
-			if (ModConfig.confEnergyInWaila) {
-				tooltip.add(Utils.format(core.getEnergy().getEnergyStored()) + " FE");
-			}
-			
-			CombinationRecipe recipe = core.getRecipe();
-			ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
-			tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
-		}
-		
-		if (block instanceof BlockBasicTable) tooltip.add(Utils.localize("tooltip.ec.tier", 1));
-		if (block instanceof BlockAdvancedTable) tooltip.add(Utils.localize("tooltip.ec.tier", 2));
-		if (block instanceof BlockEliteTable) tooltip.add(Utils.localize("tooltip.ec.tier", 3));
-		if (block instanceof BlockUltimateTable) tooltip.add(Utils.localize("tooltip.ec.tier", 4));
-		
-		if (block instanceof BlockAutomationInterface && tile instanceof TileAutomationInterface && !tile.isInvalid()) {
-			TileAutomationInterface auto = (TileAutomationInterface) tile;
-			
-			if (ModConfig.confEnergyInWaila) {
-				tooltip.add(Utils.format(auto.getEnergy().getEnergyStored()) + " FE");
-			}
-			
-			ItemStack result = auto.getResult();
-			if (!result.isEmpty()) {
-				tooltip.add(Utils.localize("tooltip.ec.crafting", result.getCount(), result.getDisplayName()));
-			}
-		}
-		
-		if (block instanceof BlockEnderCrafter && tile instanceof TileEnderCrafter && !tile.isInvalid()) {
-			TileEnderCrafter crafter = (TileEnderCrafter) tile;
-			ItemStack result = crafter.getResult();
-			if (!result.isEmpty()) {
-				tooltip.add(Utils.localize("tooltip.ec.output", result.getCount(), result.getDisplayName()));
-			}
-		}
-		
-		if (block instanceof BlockCompressor && tile instanceof TileCompressor && !tile.isInvalid()) {
-			TileCompressor compressor = (TileCompressor) tile;
-			
-			if (ModConfig.confEnergyInWaila) {
-				tooltip.add(Utils.format(compressor.getEnergy().getEnergyStored()) + " FE");
-			}
-			
-			CompressorRecipe recipe = compressor.getRecipe();
-			ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
-			tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
-		}
-		
-		return tooltip;
+	private static TooltipProvider table(int tier) {
+		return of((stack, tooltip, data, config) ->
+				tooltip.add(Utils.localize("tooltip.ec.tier", tier)));
 	}
 
+	private static <T extends TileEntity> TooltipProvider checkTile(Class<T> clazz, TileBodyConsumer<T> consumer) {
+		return of((stack, tooltip, data, config) -> {
+			TileEntity tile = data.getTileEntity();
+			if(clazz.isInstance(tile) && !tile.isInvalid()) {
+				consumer.getWailaBody(stack, tooltip, data, config, clazz.cast(tile));
+			}
+		});
+	}
+
+	@FunctionalInterface
+	private interface TileBodyConsumer<T> {
+		void getWailaBody(ItemStack stack, List<String> tooltip, IWailaDataAccessor data, IWailaConfigHandler config, T tile);
+	}
+
+	@FunctionalInterface
+	private interface BodyConsumer {
+		void getWailaBody(ItemStack stack, List<String> tooltip, IWailaDataAccessor data, IWailaConfigHandler config);
+	}
+
+	public static class TooltipProvider implements IWailaDataProvider {
+
+		private final BodyConsumer consumer;
+
+		private TooltipProvider(BodyConsumer consumer) {
+			this.consumer = consumer;
+		}
+
+		public static TooltipProvider of(BodyConsumer consumer) {
+			return new TooltipProvider(consumer);
+		}
+
+		@Nonnull
+		@Override
+		public List<String> getWailaBody(ItemStack itemStack, List<String> tooltip, IWailaDataAccessor accessor, IWailaConfigHandler config) {
+			consumer.getWailaBody(itemStack, tooltip, accessor, config);
+			return tooltip;
+		}
+	}
 }
