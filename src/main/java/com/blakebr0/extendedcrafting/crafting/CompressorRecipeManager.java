@@ -7,12 +7,11 @@ import net.minecraft.item.crafting.Ingredient;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("unused")
 public class CompressorRecipeManager {
 
 	private static final CompressorRecipeManager INSTANCE = new CompressorRecipeManager();
 
-	private final ArrayList<CompressorRecipe> recipes = new ArrayList<>();
+	private final List<CompressorRecipe> recipes = new ArrayList<>();
 
 	public static CompressorRecipeManager getInstance() {
 		return INSTANCE;
@@ -21,12 +20,6 @@ public class CompressorRecipeManager {
 	public void addRecipe(ItemStack output, Ingredient input, int inputCount, Ingredient catalyst, boolean consumeCatalyst, int powerCost) {
 		if (ModConfig.confCompressorEnabled) {
 			this.recipes.add(new CompressorRecipe(output, input, inputCount, catalyst, consumeCatalyst, powerCost));
-		}
-	}
-
-	public void addRecipe(ItemStack output, Ingredient input, int inputCount, Ingredient catalyst, boolean consumeCatalyst, int powerCost, int powerRate) {
-		if (ModConfig.confCompressorEnabled) {
-			this.recipes.add(new CompressorRecipe(output, input, inputCount, catalyst, consumeCatalyst, powerCost, powerRate));
 		}
 	}
 

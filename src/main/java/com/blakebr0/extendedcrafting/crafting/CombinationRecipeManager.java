@@ -19,12 +19,6 @@ public class CombinationRecipeManager {
 	public static CombinationRecipeManager getInstance() {
 		return INSTANCE;
 	}
-	
-	public void addRecipe(ItemStack output, long cost, Ingredient input, NonNullList<Ingredient> pedestals) {
-		if (ModConfig.confCraftingCoreEnabled) {
-			this.recipes.add(new CombinationRecipe(output, cost, input, pedestals));
-		}
-	}
 
 	public void addRecipe(ItemStack output, long cost, int perTick, Ingredient input, NonNullList<Ingredient> pedestals) {
 		if (ModConfig.confCraftingCoreEnabled) {

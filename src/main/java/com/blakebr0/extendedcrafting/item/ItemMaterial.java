@@ -10,6 +10,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -119,7 +120,7 @@ public class ItemMaterial extends ItemMeta {
 	}
 	
 	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flag) {
+	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		switch (stack.getMetadata()) {
 		case 13:
 			tooltip.add(Colors.ITALICS + Utils.localize("tooltip.ec.ultimate_catalyst"));

@@ -7,7 +7,6 @@ import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.init.Items;
 import net.minecraft.item.EnumRarity;
@@ -21,14 +20,10 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import org.apache.commons.lang3.text.WordUtils;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("UnusedReturnValue")
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ItemSingularity extends ItemMeta implements IEnableable {
 
 	public static final Map<Integer, Integer> singularityColors = new HashMap<>();
@@ -50,7 +45,7 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 	public EnumRarity getRarity(ItemStack stack) {
 		return EnumRarity.UNCOMMON;
 	}
-	
+
 	@Override
 	public void init() {
 		addSingularity(0, "coal", new ItemStack(Items.COAL), 0x1B1B1B);
@@ -82,18 +77,18 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 		addSingularity(33, "chrome", "ingotChrome", 0xC1A9AE);
 		addSingularity(34, "platinum", "ingotPlatinum", 0x6FEAEF);
 		addSingularity(35, "iridium", "ingotIridium", 0x949FBE);
-		
+
 		addSingularity(48, "signalum", "ingotSignalum", 0xDD3B00);
 		addSingularity(49, "lumium", "ingotLumium", 0xDEE59C);
 		addSingularity(50, "enderium", "ingotEnderium", 0x0B4D4E);
-		
+
 		addSingularity(64, "ardite", "ingotArdite", 0xDA4817);
 		addSingularity(65, "cobalt", "ingotCobalt", 0x023C9B);
 		addSingularity(66, "manyullyn", "ingotManyullyn", 0x5C268A);
-		
+
 		this.config.get("singularity", "default_singularities", new String[0]).setComment("Disable specific default singularities here.");
-		
-		if (this.config.hasChanged()) { 
+
+		if (this.config.hasChanged()) {
 			this.config.save();
 		}
 	}
@@ -104,44 +99,44 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 			ModelLoader.setCustomModelResourceLocation(this, item.getKey(), ResourceHelper.getModelResource(ExtendedCrafting.MOD_ID, "singularity", "inventory"));
 		}
 	}
-	
+
 	@Override
 	public boolean isEnabled() {
 		return ModConfig.confSingularityEnabled;
 	}
 
-	public ItemStack addSingularity(int meta, String name, ItemStack material, int color) {
+	public void addSingularity(int meta, String name, ItemStack material, int color) {
 		addToConfig(name);
-		
+
 		boolean enabled = checkConfig(name);
-		
+
 		if (enabled) {
 			singularityColors.put(meta, color);
 			singularityMaterials.put(meta, material);
 			ItemSingularityUltimate.addSingularityToRecipe(new ItemStack(this, 1, meta));
 		}
-		
-		return addItem(meta, name, enabled);
+
+		addItem(meta, name, enabled);
 	}
 
-	public ItemStack addSingularity(int meta, String name, String oreName, int color) {
+	public void addSingularity(int meta, String name, String oreName, int color) {
 		addToConfig(name);
-		
+
 		boolean enabled = checkConfig(name);
-		
+
 		if (enabled) {
 			singularityColors.put(meta, color);
 			singularityMaterials.put(meta, oreName);
 			ItemSingularityUltimate.addSingularityToRecipe(new ItemStack(this, 1, meta));
 		}
-		
-		return addItem(meta, name, enabled);
+
+		addItem(meta, name, enabled);
 	}
-	
+
 	public void initRecipes() {
-		if (!ModConfig.confSingularityRecipes || !this.isEnabled()) 
+		if (!ModConfig.confSingularityRecipes || !this.isEnabled())
 			return;
-		
+
 		for (Map.Entry<Integer, Object> obj : singularityMaterials.entrySet()) {
 			Object value = obj.getValue();
 			int meta = obj.getKey();
@@ -157,21 +152,21 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 			}
 		}
 	}
-	
+
 	public static ItemStack getCatalystStack() {
 		String[] parts = ModConfig.confSingularityCatalyst.split(":");
 		if (parts.length != 3) {
 			return ItemMaterial.itemUltimateCatalyst;
 		}
-		
+
 		Item item = ForgeRegistries.ITEMS.getValue(ResourceHelper.getResource(parts[0], parts[1]));
 		if (item == null) {
 			return ItemMaterial.itemUltimateCatalyst;
 		}
-		
+
 		return new ItemStack(item, 1, Integer.parseInt(parts[2]));
 	}
-	
+
 	public boolean checkConfig(String name) {
 		String[] values = this.config.get("singularity", "default_singularities", new String[0]).getStringList();
 
@@ -181,10 +176,10 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 				return Boolean.parseBoolean(entry[1]);
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	private void addToConfig(String name) {
 		Property prop = this.config.get("singularity", "default_singularities", new String[0]);
 		String[] values = prop.getStringList();
@@ -197,7 +192,7 @@ public class ItemSingularity extends ItemMeta implements IEnableable {
 					newValues[i] = name + "=" + ModConfig.removeSingularity(name);
 				}
 			}
-			
+
 			prop.set(newValues);
 		}
 	}

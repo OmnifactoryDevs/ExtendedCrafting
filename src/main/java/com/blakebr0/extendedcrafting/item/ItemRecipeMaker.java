@@ -10,7 +10,6 @@ import com.blakebr0.extendedcrafting.compat.jei.CompatJEI;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
 import com.blakebr0.extendedcrafting.tile.TileEnderCrafter;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,7 +25,6 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.oredict.OreDictionary;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
@@ -34,8 +32,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ItemRecipeMaker extends ItemBase implements IEnableable {
 
 	private static final String NEW_LINE = System.lineSeparator() + "\t";

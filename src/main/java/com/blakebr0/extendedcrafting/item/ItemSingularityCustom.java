@@ -8,7 +8,6 @@ import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.color.IItemColor;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -23,14 +22,10 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.lang3.text.WordUtils;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("UnusedReturnValue")
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEnableable {
 
 	public static final ArrayList<CustomSingularity> singularities = new ArrayList<>();
@@ -47,7 +42,7 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 		String name = items.containsKey(stack.getMetadata()) ? items.get(stack.getMetadata()).getName().replace("_", " ") : "Dummy";
 		return WordUtils.capitalize(name) + " " + Utils.localize("item.ec.singularity.name");
 	}
-	
+
 	@Override
 	public EnumRarity getRarity(ItemStack stack) {
 		return EnumRarity.UNCOMMON;
@@ -56,19 +51,19 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 	public void configure(Configuration config) {
 		ConfigCategory category = config.getCategory("singularity");
 		String[] values = config.get(category.getName(), "custom_singularities", new String[0]).getStringList();
-		category.get("custom_singularities").setComment("Here you can add your own custom Singularities." 
-						+ "\n- Syntax: meta;name;material;color"
-						+ "\n- Example: 12;super_potato;minecraft:carrot;123456"
-						+ "\n- 'meta' must be different for each, and should not be changed."
-						+ "\n- 'name' should be lower case with underscores for spaces. Singularity is added automatically."
-						+ "\n- Example: 'lots_of_spaghetti' would show 'Lots Of Spaghetti Singularity'."
-						+ "\n- 'material' is an item id or ore dictionary entry. This is for the generic crafting recipe."
-						+ "\n- Note: if you plan on adding your own recipe with the CraftTweaker integration, put 'none'."
-						+ "\n- Examples: 'minecraft:stone' for stone, 'ore:ingotIron' for the ore dictionary entry 'ingotIron'."
-						+ "\n- Note: you can also specify meta for item ids, by adding them to the end of the item id."
-						+ "\n- Example: minecraft:stone:3 for a meta of 3. Make the meta 32767 for wildcard value."
-						+ "\n- 'color' the color of the singularity as a hex value. http://htmlcolorcodes.com/"
-						+ "\n- Example: 123456 would color it as whatever that color is.");
+		category.get("custom_singularities").setComment("Here you can add your own custom Singularities."
+				+ "\n- Syntax: meta;name;material;color"
+				+ "\n- Example: 12;super_potato;minecraft:carrot;123456"
+				+ "\n- 'meta' must be different for each, and should not be changed."
+				+ "\n- 'name' should be lower case with underscores for spaces. Singularity is added automatically."
+				+ "\n- Example: 'lots_of_spaghetti' would show 'Lots Of Spaghetti Singularity'."
+				+ "\n- 'material' is an item id or ore dictionary entry. This is for the generic crafting recipe."
+				+ "\n- Note: if you plan on adding your own recipe with the CraftTweaker integration, put 'none'."
+				+ "\n- Examples: 'minecraft:stone' for stone, 'ore:ingotIron' for the ore dictionary entry 'ingotIron'."
+				+ "\n- Note: you can also specify meta for item ids, by adding them to the end of the item id."
+				+ "\n- Example: minecraft:stone:3 for a meta of 3. Make the meta 32767 for wildcard value."
+				+ "\n- 'color' the color of the singularity as a hex value. http://htmlcolorcodes.com/"
+				+ "\n- Example: 123456 would color it as whatever that color is.");
 
 		for (String value : values) {
 			String[] parts = value.split(";");
@@ -90,9 +85,9 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 				ExtendedCrafting.LOGGER.error("Invalid custom singularity syntax ints: " + value);
 				continue;
 			}
-			
+
 			singularities.add(new CustomSingularity(meta, name, material, color));
-		} 
+		}
 	}
 
 	@Override
@@ -108,22 +103,22 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 			ModelLoader.setCustomModelResourceLocation(this, item.getKey(), ResourceHelper.getModelResource(ExtendedCrafting.MOD_ID, "singularity", "inventory"));
 		}
 	}
-	
+
 	@Override
 	public boolean isEnabled() {
 		return ModConfig.confSingularityEnabled;
 	}
 
-	public ItemStack addSingularity(int meta, String name, String material, int color) {
+	public void addSingularity(int meta, String name, String material, int color) {
 		singularityColors.put(meta, color);
 		singularityMaterials.put(meta, material);
 		ItemSingularityUltimate.addSingularityToRecipe(new ItemStack(this, 1, meta));
-		return addItem(meta, name, true);
+		addItem(meta, name, true);
 	}
-	
+
 	public void initRecipes() {
 		if (!this.isEnabled()) return;
-		
+
 		for (Map.Entry<Integer, Object> obj : singularityMaterials.entrySet()) {
 			Object value = obj.getValue();
 			int meta = obj.getKey();
@@ -177,7 +172,7 @@ public class ItemSingularityCustom extends ItemMeta implements IModelHelper, IEn
 		public final String name;
 		public final String material;
 		public final int color;
-		
+
 		public CustomSingularity(int meta, String name, String material, int color) {
 			this.meta = meta;
 			this.name = name;

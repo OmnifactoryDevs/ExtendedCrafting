@@ -3,7 +3,6 @@ package com.blakebr0.extendedcrafting.crafting.table;
 import com.blakebr0.cucumber.helper.RecipeHelper;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.endercrafter.IEnderCraftingRecipe;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -12,17 +11,10 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Function;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-@SuppressWarnings("unused")
 public abstract class TableRecipeBase implements ITieredRecipe, IEnderCraftingRecipe {
-
-	public static final int MAX_CRAFT_GRID_WIDTH = 9;
-	public static final int MAX_CRAFT_GRID_HEIGHT = 9;
 
 	protected final ItemStack output;
 	protected final NonNullList<Ingredient> input;

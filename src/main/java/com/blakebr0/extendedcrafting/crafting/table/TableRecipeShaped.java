@@ -1,6 +1,5 @@
 package com.blakebr0.extendedcrafting.crafting.table;
 
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
@@ -8,13 +7,9 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.world.World;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Function;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-@SuppressWarnings("unused")
 public class TableRecipeShaped extends TableRecipeBase {
 
 	protected final int width;
@@ -69,28 +64,7 @@ public class TableRecipeShaped extends TableRecipeBase {
 
 		return true;
 	}
-	
-	@Override
-	public boolean matches(IItemHandlerModifiable inv) {
-		if (this.tier != 0 && this.tier != this.getTierFromSize(inv.getSlots()))
-			return false;
 
-		int size = (int) Math.sqrt(inv.getSlots());
-		for (int x = 0; x <= size - this.width; x++) {
-			for (int y = 0; y <= size - this.height; y++) {
-				if (this.checkMatch(inv, x, y, false)) {
-					return true;
-				}
-
-				if (this.mirrored && this.checkMatch(inv, x, y, true)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-	
 	protected boolean checkMatch(IItemHandlerModifiable inv, int startX, int startY, boolean mirror) {
 		int size = (int) Math.sqrt(inv.getSlots());
 		for (int x = 0; x < size; x++) {

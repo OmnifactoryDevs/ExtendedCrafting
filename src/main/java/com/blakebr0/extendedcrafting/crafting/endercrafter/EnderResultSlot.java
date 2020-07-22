@@ -4,9 +4,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import javax.annotation.Nonnull;
 
-@ParametersAreNonnullByDefault
 public class EnderResultSlot extends Slot {
 
 	public EnderResultSlot(IInventory inventory, int index, int xPosition, int yPosition) {
@@ -14,7 +13,7 @@ public class EnderResultSlot extends Slot {
 	}
 
 	@Override
-	public boolean isItemValid(ItemStack stack) {
+	public boolean isItemValid(@Nonnull ItemStack stack) {
 		return false;
 	}
 }

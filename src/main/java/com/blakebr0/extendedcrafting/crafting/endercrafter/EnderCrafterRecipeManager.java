@@ -1,10 +1,8 @@
 package com.blakebr0.extendedcrafting.crafting.endercrafter;
 
 import com.blakebr0.extendedcrafting.config.ModConfig;
-import com.blakebr0.extendedcrafting.crafting.table.ITieredRecipe;
 import com.blakebr0.extendedcrafting.crafting.table.TableCrafting;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShaped;
-import com.blakebr0.extendedcrafting.crafting.table.TableRecipeShapeless;
 import com.blakebr0.extendedcrafting.lib.AddonReferenced;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -40,15 +38,6 @@ public class EnderCrafterRecipeManager {
 		}
 	}
 
-	public void addShapeless(ItemStack result, int time, NonNullList<Ingredient> ingredients) {
-		TableRecipeShapeless recipe = new TableRecipeShapeless(1, result, ingredients);
-
-		if (ModConfig.confEnderEnabled) {
-			recipe.enderCrafterRecipeTimeRequired = time;
-			this.recipes.add(recipe);
-		}
-	}
-
 	public IEnderCraftingRecipe findMatchingRecipe(TableCrafting grid, World world) {
 		for (IRecipe iRecipe : this.recipes) {
 			if (iRecipe.matches(grid, world)) {
@@ -80,24 +69,4 @@ public class EnderCrafterRecipeManager {
 		return recipes;
 	}
 
-	/**
-	 * Gets all the recipes for the specified tier Basic is tier 1, Advanced
-	 * tier 2, etc
-	 *
-	 * @param tier the tier of the recipe
-	 * @return a list of recipes for this tier
-	 */
-	public List<IRecipe> getRecipesTiered(int tier) {
-		List<IRecipe> recipes = new ArrayList<>();
-		for (Object o : getRecipes()) {
-			if (o instanceof ITieredRecipe) {
-				ITieredRecipe recipe = (ITieredRecipe) o;
-				if (recipe.getTier() == tier) {
-					recipes.add(recipe);
-				}
-			}
-		}
-
-		return recipes;
-	}
 }

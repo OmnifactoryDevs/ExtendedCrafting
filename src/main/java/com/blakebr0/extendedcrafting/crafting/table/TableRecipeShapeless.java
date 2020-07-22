@@ -2,23 +2,18 @@ package com.blakebr0.extendedcrafting.crafting.table;
 
 import com.blakebr0.cucumber.helper.RecipeHelper;
 import com.blakebr0.extendedcrafting.config.ModConfig;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.function.Function;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class TableRecipeShapeless extends TableRecipeBase {
 
 	protected final ItemStack output;
@@ -90,36 +85,6 @@ public class TableRecipeShapeless extends TableRecipeBase {
 				: this.input.size() < 26 ? 2
 				: this.input.size() < 50 ? 3
 				: 4;
-	}
-
-	@Override
-	public boolean matches(IItemHandlerModifiable grid) {
-		NonNullList<Ingredient> required = NonNullList.create();
-		required.addAll(this.input);
-
-		if (this.tier != 0 && this.tier != this.getTierFromSize(grid.getSlots()))
-			return false;
-
-		for (int x = 0; x < grid.getSlots(); x++) {
-			ItemStack slot = grid.getStackInSlot(x);
-
-			if (!slot.isEmpty()) {
-				boolean inRecipe = false;
-				Iterator<Ingredient> req = required.iterator();
-
-				while (req.hasNext()) {
-					if (req.next().apply(slot)) {
-						inRecipe = true;
-						req.remove();
-						break;
-					}
-				}
-
-				if (!inRecipe) return false;
-			}
-		}
-
-		return required.isEmpty();
 	}
 
 	public TableRecipeShapeless withTransforms(Map<Integer, Function<ItemStack, ItemStack>> transformers) {

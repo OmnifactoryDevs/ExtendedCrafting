@@ -7,7 +7,6 @@ import com.blakebr0.cucumber.util.Utils;
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.table.TableRecipeManager;
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
@@ -19,13 +18,10 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.crafting.CraftingHelper;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 
 	public static final ArrayList<ItemStack> singularities = new ArrayList<>();
@@ -42,10 +38,10 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 		ConfigCategory category = config.getCategory("singularity");
 		String[] values = config.get(category.getName(), "ultimate_singularity_recipe_blacklist", new String[0]).getStringList();
 		category.get("ultimate_singularity_recipe_blacklist").setComment("Blacklist Singularities from being in the Ultimate Singularity crafting recipe."
-						+ "\n- Syntax: singularityType;meta"
-						+ "\n- 'singularityType' can be 'default' or 'custom'."
-						+ "\n- 'default' for the ones added by the mod by default, 'custom' being the ones defined in '_custom_singularities'."
-						+ "\n- Example: custom;12");
+				+ "\n- Syntax: singularityType;meta"
+				+ "\n- 'singularityType' can be 'default' or 'custom'."
+				+ "\n- 'default' for the ones added by the mod by default, 'custom' being the ones defined in '_custom_singularities'."
+				+ "\n- Example: custom;12");
 
 		for (String value : values) {
 			String[] parts = value.split(";");
@@ -77,7 +73,7 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isEnabled() {
 		return ModConfig.confSingularityEnabled;
@@ -105,7 +101,7 @@ public class ItemSingularityUltimate extends ItemBase implements IEnableable {
 	public void initRecipe() {
 		if (!ModConfig.confUltimateSingularityRecipe || !this.isEnabled())
 			return;
-		
+
 		TableRecipeManager.getInstance()
 				.addShapeless(4, new ItemStack(ModItems.itemSingularityUltimate, 1, 0),
 						singularities.stream()

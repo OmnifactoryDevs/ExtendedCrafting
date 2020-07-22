@@ -1,14 +1,11 @@
 package com.blakebr0.extendedcrafting.crafting.table;
 
 import com.blakebr0.extendedcrafting.lib.IExtendedTable;
-
-import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
-@MethodsReturnNonnullByDefault
 public class TableCraftResult extends InventoryCraftResult {
 
 	private final IExtendedTable tile;
