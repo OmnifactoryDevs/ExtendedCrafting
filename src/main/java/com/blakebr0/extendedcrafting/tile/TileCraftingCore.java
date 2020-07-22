@@ -43,7 +43,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 
 		if (!stack.isEmpty()) {
 			for (CombinationRecipe recipe : CombinationRecipeManager.getInstance().getRecipes()) {
-				if (recipe.getInput().apply(stack)) {
+				if (recipe.getInputIngredient().apply(stack)) {
 					valid.add(recipe);
 				}
 			}

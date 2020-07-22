@@ -8,9 +8,11 @@ import com.blakebr0.extendedcrafting.block.craftingtable.BlockBasicTable;
 import com.blakebr0.extendedcrafting.block.craftingtable.BlockEliteTable;
 import com.blakebr0.extendedcrafting.block.craftingtable.BlockUltimateTable;
 
+import com.blakebr0.extendedcrafting.lib.AddonReferenced;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 
+@AddonReferenced
 public class ModBlocks {
 
 	public static final BlockStorage blockStorage = new BlockStorage();
@@ -19,21 +21,21 @@ public class ModBlocks {
 	public static final BlockTrimmed blockTrimmed = new BlockTrimmed();
 
 	public static final BlockPedestal blockPedestal = new BlockPedestal();
-	public static final BlockCraftingCore blockCraftingCore = new BlockCraftingCore();
+	@AddonReferenced public static final BlockCraftingCore blockCraftingCore = new BlockCraftingCore();
 	
 	public static final BlockBasic blockCraftingTable = new BlockBasic("ec.crafting_table", Material.WOOD, SoundType.WOOD, 2.5F, 10.0F);
 	
 	public static final BlockAutomationInterface blockAutomationInterface = new BlockAutomationInterface();
 
-	public static final BlockBasicTable blockBasicTable = new BlockBasicTable();
-	public static final BlockAdvancedTable blockAdvancedTable = new BlockAdvancedTable();
-	public static final BlockEliteTable blockEliteTable = new BlockEliteTable();
-	public static final BlockUltimateTable blockUltimateTable = new BlockUltimateTable();
+	@AddonReferenced public static final BlockBasicTable blockBasicTable = new BlockBasicTable();
+	@AddonReferenced public static final BlockAdvancedTable blockAdvancedTable = new BlockAdvancedTable();
+	@AddonReferenced public static final BlockEliteTable blockEliteTable = new BlockEliteTable();
+	@AddonReferenced public static final BlockUltimateTable blockUltimateTable = new BlockUltimateTable();
 
 	public static final BlockCompressor blockCompressor = new BlockCompressor();
 	
 	public static final BlockEnderAlternator blockEnderAlternator = new BlockEnderAlternator();
-	public static final BlockEnderCrafter blockEnderCrafter = new BlockEnderCrafter();
+	@AddonReferenced public static final BlockEnderCrafter blockEnderCrafter = new BlockEnderCrafter();
 
 	public static void init() {
 		final ModRegistry registry = ExtendedCrafting.REGISTRY;

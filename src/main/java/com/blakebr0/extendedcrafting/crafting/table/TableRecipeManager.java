@@ -1,6 +1,7 @@
 package com.blakebr0.extendedcrafting.crafting.table;
 
 import com.blakebr0.extendedcrafting.config.ModConfig;
+import com.blakebr0.extendedcrafting.lib.AddonReferenced;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -15,46 +16,43 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"UnusedReturnValue", "unused"})
+@AddonReferenced
 public class TableRecipeManager {
 
 	private static final TableRecipeManager INSTANCE = new TableRecipeManager();
 	private final List<ITieredRecipe> recipes = new ArrayList<>();
 
+	@AddonReferenced
 	public static TableRecipeManager getInstance() {
 		return INSTANCE;
 	}
 
-	public TableRecipeShaped addShaped(ItemStack result, CraftingHelper.ShapedPrimer primer) {
-		return addShaped(0, result, primer.width, primer.height, primer.input);
+	public void addShaped(ItemStack result, CraftingHelper.ShapedPrimer primer) {
+		addShaped(0, result, primer.width, primer.height, primer.input);
 	}
 
-	public TableRecipeShaped addShaped(int tier, ItemStack result, CraftingHelper.ShapedPrimer primer) {
-		return addShaped(tier, result, primer.width, primer.height, primer.input);
+	public void addShaped(int tier, ItemStack result, CraftingHelper.ShapedPrimer primer) {
+		addShaped(tier, result, primer.width, primer.height, primer.input);
 	}
 
-	public TableRecipeShaped addShaped(int tier, ItemStack result, int width, int height, NonNullList<Ingredient> recipe) {
+	public void addShaped(int tier, ItemStack result, int width, int height, NonNullList<Ingredient> recipe) {
 		TableRecipeShaped craft = new TableRecipeShaped(tier, result, width, height, recipe);
-		
+
 		if (ModConfig.confTableEnabled) {
 			this.recipes.add(craft);
 		}
-		
-		return craft;
 	}
 
-	public TableRecipeShapeless addShapeless(ItemStack result, NonNullList<Ingredient> ingredients) {
-		return addShapeless(0, result, ingredients);
+	public void addShapeless(ItemStack result, NonNullList<Ingredient> ingredients) {
+		addShapeless(0, result, ingredients);
 	}
 
-	public TableRecipeShapeless addShapeless(int tier, ItemStack result, NonNullList<Ingredient> ingredients) {
+	public void addShapeless(int tier, ItemStack result, NonNullList<Ingredient> ingredients) {
 		TableRecipeShapeless recipe = new TableRecipeShapeless(tier, result, ingredients);
 
 		if (ModConfig.confTableEnabled) {
 			this.recipes.add(recipe);
 		}
-
-		return recipe;
 	}
 
 	public ItemStack findMatchingRecipe(InventoryCrafting grid, World world) {
@@ -68,17 +66,17 @@ public class TableRecipeManager {
 				if (i == 0) {
 					stack = stack2;
 				}
-				
+
 				if (i == 1) {
 					stack1 = stack2;
 				}
-				
+
 				i++;
 			}
 		}
 
-		if (i == 2 && stack.getItem() == stack1.getItem() && stack.getCount() == 1 && stack1.getCount() == 1 && stack.getItem().isRepairable()) {
-			Item item = stack.getItem();
+		Item item = stack.getItem();
+		if (i == 2 && item == stack1.getItem() && stack.getCount() == 1 && stack1.getCount() == 1 && item.isRepairable()) {
 			int maxDamage = stack.getMaxDamage();
 			int j1 = maxDamage - stack.getItemDamage();
 			int k = maxDamage - stack1.getItemDamage();
@@ -88,8 +86,8 @@ public class TableRecipeManager {
 			if (i1 < 0) {
 				i1 = 0;
 			}
-			
-			return new ItemStack(stack.getItem(), 1, i1);
+
+			return new ItemStack(item, 1, i1);
 		} else {
 			for (IRecipe recipe : this.recipes) {
 				if (recipe.matches(grid, world)) {
@@ -112,11 +110,12 @@ public class TableRecipeManager {
 	public List<ITieredRecipe> getRecipes() {
 		return this.recipes;
 	}
-	
+
 	public void removeRecipes(ItemStack stack) {
 		this.recipes.removeIf(recipe -> recipe != null && recipe.getRecipeOutput().isItemEqual(stack));
 	}
 
+	@AddonReferenced
 	public List<IRecipe> getRecipes(int size) {
 		List<IRecipe> recipes = new ArrayList<>();
 		for (IRecipe r : this.getRecipes()) {
@@ -124,14 +123,14 @@ public class TableRecipeManager {
 				recipes.add(r);
 			}
 		}
-		
+
 		return recipes;
 	}
 
 	/**
 	 * Gets all the recipes for the specified tier Basic is tier 1, Advanced
 	 * tier 2, etc
-	 * 
+	 *
 	 * @param tier the tier of the recipe
 	 * @return a list of recipes for this tier
 	 */
@@ -144,11 +143,11 @@ public class TableRecipeManager {
 				}
 			}
 		}
-		
+
 		return recipes;
 	}
-	
-    public static NonNullList<ItemStack> getRemainingItems(InventoryCrafting grid, World world) {
+
+	public static NonNullList<ItemStack> getRemainingItems(InventoryCrafting grid, World world) {
 		for (int j = 0; j < getInstance().recipes.size(); j++) {
 			IRecipe recipe = getInstance().recipes.get(j);
 			if (recipe.matches(grid, world)) {
@@ -156,6 +155,7 @@ public class TableRecipeManager {
 			}
 		}
 
-        return CraftingManager.getRemainingItems(grid, world);
-    }
+		return CraftingManager.getRemainingItems(grid, world);
+	}
 }
+

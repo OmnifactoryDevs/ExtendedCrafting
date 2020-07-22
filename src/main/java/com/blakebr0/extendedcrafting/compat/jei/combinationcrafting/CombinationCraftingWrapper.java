@@ -67,7 +67,7 @@ public class CombinationCraftingWrapper implements IRecipeWrapper {
 		ItemStack output = this.recipe.getOutput();
 
 		List<List<ItemStack>> inputs = new ArrayList<>();
-		inputs.add(helper.toItemStackList(this.recipe.getInput()));
+		inputs.add(helper.toItemStackList(this.recipe.getInputIngredient()));
 		inputs.addAll(helper.expandRecipeItemStackInputs(this.recipe.getPedestalIngredients()));
 
 		ingredients.setInputLists(VanillaTypes.ITEM, inputs);
