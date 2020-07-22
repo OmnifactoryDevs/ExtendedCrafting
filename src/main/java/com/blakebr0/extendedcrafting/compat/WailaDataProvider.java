@@ -54,7 +54,9 @@ public class WailaDataProvider implements IWailaDataProvider {
 
 					CombinationRecipe recipe = core.getRecipe();
 					ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
-					tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
+					if (!output.isEmpty()) {
+						tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
+					}
 				}),
 				BlockCraftingCore.class
 		);
@@ -88,7 +90,9 @@ public class WailaDataProvider implements IWailaDataProvider {
 
 					CompressorRecipe recipe = compressor.getRecipe();
 					ItemStack output = recipe == null ? ItemStack.EMPTY : recipe.getOutput();
-					tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
+					if (!output.isEmpty()) {
+						tooltip.add(Utils.localize("tooltip.ec.crafting", output.getCount(), output.getDisplayName()));
+					}
 				}),
 				BlockCompressor.class
 		);
@@ -107,7 +111,7 @@ public class WailaDataProvider implements IWailaDataProvider {
 	private static <T extends TileEntity> TooltipProvider checkTile(Class<T> clazz, TileBodyConsumer<T> consumer) {
 		return of((stack, tooltip, data, config) -> {
 			TileEntity tile = data.getTileEntity();
-			if(clazz.isInstance(tile) && !tile.isInvalid()) {
+			if (clazz.isInstance(tile) && !tile.isInvalid()) {
 				consumer.getWailaBody(stack, tooltip, data, config, clazz.cast(tile));
 			}
 		});
