@@ -25,8 +25,7 @@ public class EnderCrafterRecipeManager {
 		return INSTANCE;
 	}
 
-	public TableRecipeShaped addShaped(ItemStack result, int time, Object... recipe) {
-		CraftingHelper.ShapedPrimer primer = CraftingHelper.parseShaped(recipe);
+	public TableRecipeShaped addShaped(ItemStack result, int time, CraftingHelper.ShapedPrimer primer) {
 		return addShaped(result, time, primer.input);
 	}
 

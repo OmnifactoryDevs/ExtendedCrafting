@@ -8,7 +8,6 @@ import com.blakebr0.extendedcrafting.crafting.CompressorRecipeManager;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
@@ -82,6 +81,7 @@ public class TileCompressor extends TileInventoryBase implements ISidedInventory
 			if (recipe != null && this.getEnergy().getEnergyStored() > 0) {
 				if (this.materialCount >= recipe.getInputCount()) {
 					this.process(recipe);
+					mark = true;
 					if (this.progress == recipe.getPowerCost()) {
 						ItemStack recipeOutput = recipe.getOutput();
 						if ((output.isEmpty() || StackHelper.areStacksEqual(output, recipeOutput)) && output.getCount() < recipeOutput.getMaxStackSize()) {
@@ -117,9 +117,7 @@ public class TileCompressor extends TileInventoryBase implements ISidedInventory
 						if (this.progress > 0) {
 							this.progress = 0;
 						}
-						if (!mark) {
-							mark = true;
-						}
+						mark = true;
 					}
 				}
 			}
@@ -127,9 +125,7 @@ public class TileCompressor extends TileInventoryBase implements ISidedInventory
 
 		if (this.oldEnergy != this.energy.getEnergyStored()) {
 			this.oldEnergy = this.energy.getEnergyStored();
-			if (!mark) {
-				mark = true;
-			}
+			mark = true;
 		}
 
 		if (mark) {
@@ -142,10 +138,7 @@ public class TileCompressor extends TileInventoryBase implements ISidedInventory
 		List<CompressorRecipe> recipes = this.getValidRecipes(this.materialStack);
 		if (!recipes.isEmpty()) {
 			for (CompressorRecipe recipe : recipes) {
-				ItemStack mat = this.materialStack;
-				Ingredient input = recipe.getInput();
-
-				if (input.apply(mat)) {
+				if (recipe.getCatalyst().apply(getStackInSlot(2))) {
 					return recipe;
 				}
 			}

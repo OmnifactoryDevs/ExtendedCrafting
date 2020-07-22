@@ -37,8 +37,8 @@ public class CompressorCraftingWrapper implements IRecipeWrapper {
 	public void getIngredients(IIngredients ingredients) {
 		List<List<ItemStack>> stacks = new ArrayList<>();
 		
-		stacks.add(Arrays.asList(this.recipe.getInput().getMatchingStacks()));
 		stacks.add(Arrays.asList(recipe.getInput().getMatchingStacks()));
+		stacks.add(Arrays.asList(recipe.getCatalyst().getMatchingStacks()));
 		
 		ingredients.setInputLists(VanillaTypes.ITEM, stacks);
 		ingredients.setOutput(VanillaTypes.ITEM, this.recipe.getOutput());

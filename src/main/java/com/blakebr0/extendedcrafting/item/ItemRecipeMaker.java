@@ -37,7 +37,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemRecipeMaker extends ItemBase implements IEnableable {
-	
+
 	private static final String NEW_LINE = System.lineSeparator() + "\t";
 
 	public ItemRecipeMaker() {
@@ -45,17 +45,17 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 		this.setCreativeTab(ExtendedCrafting.CREATIVE_TAB);
 		this.setMaxStackSize(1);
 		this.setHasSubtypes(true);
-		
+
 		if (Loader.isModLoaded("jei") && this.isEnabled()) {
 			CompatJEI.items.add(this);
 		}
 	}
-	
+
 	@Override
 	public boolean isEnabled() {
 		return ModConfig.confRMEnabled;
 	}
-	
+
 	@Override
 	public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> items) {
 		if (isInCreativeTab(tab)) {
@@ -74,59 +74,64 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 		TileEntity tile = world.getTileEntity(pos);
 
 		if (tile instanceof IExtendedTable) {
-			if (world.isRemote) {
-				setClipboard(tile, stack);
+			if (world.isRemote && setClipboard((IExtendedTable) tile, stack)) {
 				player.sendMessage(new TextComponentTranslation("message.ec.copied_recipe"));
-				
+
 				if (ModConfig.confRMNBT && !Loader.isModLoaded("crafttweaker")) {
 					player.sendMessage(new TextComponentTranslation("message.ec.nbt_requires_crafttweaker"));
 				}
 			}
-			
+
 			return EnumActionResult.SUCCESS;
 		}
 
 		return EnumActionResult.PASS;
 	}
-	
+
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 		ItemStack stack = player.getHeldItem(hand);
-		
+
 		if (player.isSneaking()) {
 			NBTHelper.flipBoolean(stack, "Shapeless");
-			
+
 			if (world.isRemote) {
 				player.sendMessage(new TextComponentTranslation("message.ec.changed_mode", getModeString(stack)));
 			}
 		}
-		
+
 		return super.onItemRightClick(world, player, hand);
 	}
-	
+
 	@Override
 	public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
 		tooltip.add(Utils.localize("tooltip.ec.mode", getModeString(stack)));
 	}
 
-	private void setClipboard(TileEntity table, ItemStack stack) {
+	private boolean setClipboard(IExtendedTable table, ItemStack stack) {
 		if (Desktop.isDesktopSupported()) {
-			String string = "mods.extendedcrafting." + (table instanceof TileEnderCrafter ? "EnderCrafting" : "TableCrafting");
-			
+			StringBuilder string = new StringBuilder("mods.extendedcrafting.")
+					.append(table instanceof TileEnderCrafter ? "EnderCrafting" : "TableCrafting");
+
 			if (isShapeless(stack)) {
-				string += ".addShapeless(0, <>, [" + makeItemArrayShapeless((IExtendedTable) table);
+				string.append(".addShapeless(0, <>, [")
+						.append(makeItemArrayShapeless(table));
 			} else {
-				string += ".addShaped(0, <>, [" + NEW_LINE + makeItemArrayShaped((IExtendedTable) table);
+				string.append(".addShaped(0, <>, [")
+						.append(NEW_LINE)
+						.append(makeItemArrayShaped(table));
 			}
-			
-			string += "]);";
-			
-			StringSelection stringSelection = new StringSelection(string);
+
+			string.append("]);");
+
+			StringSelection stringSelection = new StringSelection(string.toString());
 			Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
 			clipboard.setContents(stringSelection, null);
+			return true;
 		}
+		return false;
 	}
-	
+
 	private String makeItemArrayShaped(IExtendedTable table) {
 		StringBuilder string = new StringBuilder();
 		NonNullList<ItemStack> matrix = table.getMatrix();
@@ -137,7 +142,7 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 			}
 
 			ItemStack stack = matrix.get(i);
-			
+
 			String item = "";
 			if (ModConfig.confRMOredict && !stack.isEmpty()) {
 				int[] oreIds = OreDictionary.getOreIDs(stack);
@@ -145,7 +150,7 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 					item = "ore:" + OreDictionary.getOreName(oreIds[0]);
 				}
 			}
-			
+
 			if (item.isEmpty()) {
 				String reg = Objects.requireNonNull(stack.getItem().getRegistryName()).toString();
 				item = stack.isEmpty() ? "null" : reg;
@@ -153,10 +158,10 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 					item += ":" + stack.getMetadata();
 				}
 			}
-			
+
 			if (!item.equalsIgnoreCase("null")) {
 				string.append("<").append(item).append(">");
-				
+
 				if (ModConfig.confRMNBT && !stack.isEmpty() && stack.hasTagCompound() && Loader.isModLoaded("crafttweaker")) {
 					NBTBase nbt = stack.serializeNBT().getTag("tag");
 					String tag = CraftTweakerUtils.writeTag(nbt);
@@ -165,11 +170,11 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 			} else {
 				string.append(item);
 			}
-			
+
 			if ((i + 1) % sr != 0) {
 				string.append(", ");
 			}
-			
+
 			if (i + 1 == sr || (i + 1) % sr == 0) {
 				string.append("]");
 				if (i + 1 < matrix.size()) {
@@ -180,10 +185,10 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 				}
 			}
 		}
-		
+
 		return string.toString();
 	}
-	
+
 	private String makeItemArrayShapeless(IExtendedTable table) {
 		StringBuilder string = new StringBuilder();
 		NonNullList<ItemStack> matrix = table.getMatrix();
@@ -196,7 +201,7 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 				lastSlot = i;
 			}
 		}
-		
+
 		for (int i : slots) {
 			ItemStack stack = matrix.get(i);
 			int[] oreIds = OreDictionary.getOreIDs(stack);
@@ -210,29 +215,29 @@ public class ItemRecipeMaker extends ItemBase implements IEnableable {
 					item += ":" + stack.getMetadata();
 				}
 			}
-					
+
 			string.append("<").append(item).append(">");
-			
+
 			if (ModConfig.confRMNBT && !stack.isEmpty() && stack.hasTagCompound() && Loader.isModLoaded("crafttweaker")) {
 				NBTBase nbt = stack.serializeNBT().getTag("tag");
 				String tag = CraftTweakerUtils.writeTag(nbt);
 				string.append(".withTag(").append(tag).append(")");
 			}
-			
+
 			if (i != lastSlot) {
 				string.append(", ");
 			}
 		}
-		
+
 		return string.toString();
 	}
-	
+
 	private String getModeString(ItemStack stack) {
 		NBTTagCompound tag = stack.getTagCompound();
 		boolean shapeless = (tag != null && tag.hasKey("Shapeless")) && tag.getBoolean("Shapeless");
 		return shapeless ? "Shapeless" : "Shaped";
 	}
-	
+
 	private boolean isShapeless(ItemStack stack) {
 		NBTTagCompound tag = stack.getTagCompound();
 		return (tag != null && tag.hasKey("Shapeless")) && tag.getBoolean("Shapeless");

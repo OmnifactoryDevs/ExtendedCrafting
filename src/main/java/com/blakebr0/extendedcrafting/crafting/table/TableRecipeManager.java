@@ -13,9 +13,7 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"UnusedReturnValue", "unused"})
 public class TableRecipeManager {
@@ -27,9 +25,12 @@ public class TableRecipeManager {
 		return INSTANCE;
 	}
 
-	public TableRecipeShaped addShaped(ItemStack result, Object... recipe) {
-		CraftingHelper.ShapedPrimer primer = CraftingHelper.parseShaped(recipe);
+	public TableRecipeShaped addShaped(ItemStack result, CraftingHelper.ShapedPrimer primer) {
 		return addShaped(0, result, primer.width, primer.height, primer.input);
+	}
+
+	public TableRecipeShaped addShaped(int tier, ItemStack result, CraftingHelper.ShapedPrimer primer) {
+		return addShaped(tier, result, primer.width, primer.height, primer.input);
 	}
 
 	public TableRecipeShaped addShaped(int tier, ItemStack result, int width, int height, NonNullList<Ingredient> recipe) {
@@ -54,14 +55,6 @@ public class TableRecipeManager {
 		}
 
 		return recipe;
-	}
-
-	@Deprecated
-	public TableRecipeShapeless addShapeless(ItemStack result, Object... ingredients) {
-		NonNullList<Ingredient> ing = Arrays.stream(ingredients)
-				.map(CraftingHelper::getIngredient)
-				.collect(Collectors.toCollection(NonNullList::create));
-		return addShapeless(0, result, ing);
 	}
 
 	public ItemStack findMatchingRecipe(InventoryCrafting grid, World world) {

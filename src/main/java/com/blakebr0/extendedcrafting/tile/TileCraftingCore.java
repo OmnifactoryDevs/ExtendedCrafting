@@ -63,6 +63,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 			if (recipe != null && this.getEnergy().getEnergyStored() > 0) {
 				List<TilePedestal> pedestals = this.getPedestalsWithStuff(recipe, pedestalLocations);
 				boolean done = this.process(recipe);
+				mark = true;
 				if (done) {
 					for (TilePedestal pedestal : pedestals) {
 						IItemHandlerModifiable inventory = pedestal.getInventory();
@@ -73,7 +74,6 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 					((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.END_ROD, false, this.getPos().getX() + 0.5D, this.getPos().getY() + 1.1D, this.getPos().getZ() + 0.5D, 50, 0, 0, 0, 0.1D);
 					this.getInventory().setStackInSlot(0, recipe.getOutput().copy());
 					this.progress = 0;
-					mark = true;
 				} else {
 					((WorldServer) this.getWorld()).spawnParticle(EnumParticleTypes.SPELL, false, this.getPos().getX() + 0.5D, this.getPos().getY() + 1.1D, this.getPos().getZ() + 0.5D, 2, 0, 0, 0, 0.1D);
 				}
@@ -82,9 +82,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 
 		if (this.oldEnergy != this.energy.getEnergyStored()) {
 			this.oldEnergy = this.energy.getEnergyStored();
-			if (!mark) {
-				mark = true;
-			}
+			mark = true;
 		}
 
 		if (mark) {
