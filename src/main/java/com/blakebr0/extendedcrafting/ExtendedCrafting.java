@@ -19,8 +19,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class ExtendedCrafting {
 
 	public static final String MOD_ID = "extendedcrafting";
-	public static final String NAME = "Extended Crafting";
-	public static final String VERSION = "${version}";
+	public static final String NAME = "GRADLE:MODNAME";
+	public static final String VERSION = "GRADLE:VERSION";
 	public static final String GUI_FACTORY = "com.blakebr0.extendedcrafting.config.GuiFactory";
 	public static final String DEPENDENCIES = "required-after:cucumber@[1.1.2,)";
 
