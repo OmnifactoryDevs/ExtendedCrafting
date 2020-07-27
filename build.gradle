@@ -29,7 +29,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 //Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 
-group = "omnifactorydevs.morefurnaces" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "omnifactorydevs.extendedcrafting" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 version = getRewrittenVersion()
 archivesBaseName = project_artifact_name
 
