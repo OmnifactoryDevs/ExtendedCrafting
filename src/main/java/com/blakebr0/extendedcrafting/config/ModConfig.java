@@ -1,14 +1,13 @@
 package com.blakebr0.extendedcrafting.config;
 
-import java.io.File;
-
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import com.blakebr0.extendedcrafting.item.ModItems;
-
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.io.File;
 
 public class ModConfig {
 
@@ -22,10 +21,12 @@ public class ModConfig {
 	public static boolean confCraftingCoreEnabled;
 	public static int confCraftingCoreRFCapacity;
 	public static int confCraftingCoreRFRate;
-	
+	public static boolean confCraftingCoreAcceptGTEU;
+
 	public static boolean confInterfaceEnabled;
 	public static int confInterfaceRFCapacity;
 	public static int confInterfaceRFRate;
+	public static boolean confInterfaceAcceptGTEU;
 	public static boolean confInterfaceRenderer;
 	
 	public static boolean confTableEnabled;
@@ -34,6 +35,7 @@ public class ModConfig {
 	public static boolean confCompressorEnabled;
 	public static int confCompressorRFCapacity;
 	public static int confCompressorRFRate;
+	public static boolean confCompressorAcceptGTEU;
 	public static boolean confCompressorRenderer;
 	
 	public static boolean confEnderEnabled;
@@ -50,6 +52,8 @@ public class ModConfig {
 	public static boolean confSingularityRecipes;
 	public static boolean confUltimateSingularityRecipe;
 	public static String confSingularityCatalyst;
+
+	public static int confEUtoRF;
 
 	@SubscribeEvent
 	public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
@@ -80,12 +84,14 @@ public class ModConfig {
 		confCraftingCoreEnabled = config.getBoolean("enabled", category, true, "Should the Crafting Core and Pedestal be enabled?");
 		confCraftingCoreRFCapacity = config.getInt("energy_capacity", category, 5000000, 0, Integer.MAX_VALUE, "How much FE the Crafting Core should hold.");
 		confCraftingCoreRFRate = config.getInt("energy_rate", category, 500, 0, Integer.MAX_VALUE, "How much FE/t the Crafting Core should use when crafting by default.");
+		confCraftingCoreAcceptGTEU = config.getBoolean("accept_gteu", category, false, "Should the Crafting Core accept GTEU?");
 
 		category = "automation_interface";
 		config.setCategoryComment(category, "Settings for the Automation Interface.");
 		confInterfaceEnabled = config.getBoolean("enabled", category, true, "Should the Automation Interface be enabled?");
 		confInterfaceRFCapacity = config.getInt("energy_capacity", category, 1000000, 0, Integer.MAX_VALUE, "How much FE the Automation Interface should hold.");
 		confInterfaceRFRate = config.getInt("energy_rate", category, 80, 0, 100000, "How much FE the Automation Interface should use when moving items.");
+		confInterfaceAcceptGTEU = config.getBoolean("accept_gteu", category, false, "Should the Automation Interface accept GTEU?");
 		confInterfaceRenderer = config.getBoolean("render_item", category, true, "Should the Automation Interface render the result item inside it?");
 		
 		category = "table_crafting";
@@ -98,6 +104,7 @@ public class ModConfig {
 		confCompressorEnabled = config.getBoolean("enabled", category, true, "Should the Quantum Compressor be enabled?");
 		confCompressorRFCapacity = config.getInt("energy_capacity", category, 10000000, 0, Integer.MAX_VALUE, "How much FE the Quantum Compressor should hold.");
 		confCompressorRFRate = config.getInt("energy_rate", category, 5000, 0, Integer.MAX_VALUE, "How much FE/t the Quantum Compressor should use when crafting by default.");
+		confCompressorAcceptGTEU = config.getBoolean("accept_gteu", category, false, "Should the Quantum Compressor accept GTEU?");
 		confCompressorRenderer = config.getBoolean("render_item", category, true, "Should the Quantum Compressor render the result item above it?");
 		
 		category = "ender_crafting";
@@ -122,6 +129,10 @@ public class ModConfig {
 		confUltimateSingularityRecipe = config.getBoolean("ultimate_singularity_recipe", category, true, "Should the default Ultimate Singularity recipe be enabled?");
 		ModItems.itemSingularityCustom.configure(config);
 		ModItems.itemSingularityUltimate.configure(config);
+
+		category = "gregtech";
+		config.setCategoryComment(category, "Settings for GregTech compatibility.");
+		confEUtoRF = config.getInt("conversion", category, 4, 1, Integer.MAX_VALUE, "How much RF should one GTEU be handled as?");
 
 		if (config.hasChanged()) {
 			config.save();

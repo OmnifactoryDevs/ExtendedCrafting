@@ -4,6 +4,8 @@ import com.blakebr0.cucumber.energy.EnergyStorageCustom;
 import com.blakebr0.cucumber.helper.StackHelper;
 import com.blakebr0.cucumber.util.VanillaPacketDispatcher;
 import com.blakebr0.extendedcrafting.block.BlockPedestal;
+import com.blakebr0.extendedcrafting.compat.gregtech.IGTCapHolder;
+import com.blakebr0.extendedcrafting.compat.gregtech.IGTEnergyContainer;
 import com.blakebr0.extendedcrafting.config.ModConfig;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipe;
 import com.blakebr0.extendedcrafting.crafting.CombinationRecipeManager;
@@ -22,6 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
@@ -29,7 +32,9 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class TileCraftingCore extends TileEntity implements ITickable {
+@Optional.Interface(modid = "gregtech",
+		iface = "com.blakebr0.extendedcrafting.compat.gregtech.IGTEnergyContainer")
+public class TileCraftingCore extends TileEntity implements ITickable, IGTEnergyContainer, IGTCapHolder {
 
 	private final ItemStackHandler inventory = new StackHandler();
 	private final EnergyStorageCustom energy = new EnergyStorageCustom(ModConfig.confCraftingCoreRFCapacity);
@@ -178,6 +183,7 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 		return this.inventory;
 	}
 
+	@Override
 	public EnergyStorageCustom getEnergy() {
 		return this.energy;
 	}
@@ -236,6 +242,11 @@ public class TileCraftingCore extends TileEntity implements ITickable {
 			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.inventory);
 		} else if (capability == CapabilityEnergy.ENERGY) {
 			return CapabilityEnergy.ENERGY.cast(this.energy);
+		} else if (ModConfig.confCraftingCoreAcceptGTEU) {
+			T cap = getGTCapability(capability);
+			if (cap != null) {
+				return cap;
+			}
 		}
 
 		return super.getCapability(capability, side);
