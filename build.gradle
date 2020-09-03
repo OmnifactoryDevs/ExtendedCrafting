@@ -56,6 +56,12 @@ repositories {
     maven {
         url = "https://maven.blamejared.com/"
     }
+    maven {
+        url = "http://chickenbones.net/maven/"
+    }
+    maven {
+        url = "https://minecraft.curseforge.com/api/maven"
+    }
 }
 
 dependencies {
@@ -66,6 +72,8 @@ dependencies {
     deobfCompile "curse.maven:hwyla:2568751"
     deobfCompile "curse.maven:packagedauto:2977147"
     deobfCompile "curse.maven:pexc:2899874"
+    deobfCompile "gregtechce:gregtech:1.12.2:1.10.1.557"
+    deobfCompile "codechicken-lib-1-8:CodeChickenLib-1.12.2:3.2.3.357:universal"
 }
 
 processResources {
