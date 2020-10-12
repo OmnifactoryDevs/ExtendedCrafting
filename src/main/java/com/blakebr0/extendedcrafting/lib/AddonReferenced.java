@@ -2,7 +2,6 @@ package com.blakebr0.extendedcrafting.lib;
 
 import com.blakebr0.extendedcrafting.ExtendedCrafting;
 import net.minecraftforge.fml.common.ICrashCallable;
-import thelm.packagedexcrafting.PackagedExCrafting;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -17,7 +16,7 @@ public @interface AddonReferenced {
 
 		@Override
 		public String getLabel() {
-			return PackagedExCrafting.NAME;
+			return ExtendedCrafting.NAME;
 		}
 
 		@Override
