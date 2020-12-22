@@ -8,7 +8,6 @@ import net.minecraft.util.NonNullList;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AddonReferenced
 public class CombinationRecipe {
@@ -59,13 +58,13 @@ public class CombinationRecipe {
 		return this.pedestals;
 	}
 
+	/**
+	 * Used to be {@code ArrayList<Object>}, which means returning {@link Ingredient} is fine.
+	 * Callers coerce to that anyway, if they want to do something useful with it.
+	 */
 	@AddonReferenced
-	public ArrayList<ItemStack> getPedestalItems() {
-		return getPedestalIngredients()
-				.stream()
-				.map(Ingredient::getMatchingStacks)
-				.map(stacks -> stacks[0])
-				.collect(Collectors.toCollection(ArrayList::new));
+	public ArrayList<Ingredient> getPedestalItems() {
+		return new ArrayList<>(getPedestalIngredients());
 	}
 
 }
